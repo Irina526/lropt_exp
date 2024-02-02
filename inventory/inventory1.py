@@ -178,7 +178,7 @@ def data_modes(N, m, scales, seed):
 
 def trainloop(r1,foldername):
     seed = r1
-    for N in np.array([50,100,300,500,1000,1500,2000,3000,4000,5000]):
+    for N in np.array([1000,2000,3000]):
         print(N,r1)
         # seed += 1
         # s = 0
@@ -195,8 +195,13 @@ def trainloop(r1,foldername):
                 seed += 1
             else: 
                 data_gen = True
-        newdata = data_modes(20000,m,[1,2,3],seed = 10000+seed)
+        newdata = data_modes(1000,m,[1,2,3],seed = 10000+seed)
+        num_reps = int(N/5)
+        y_data1 = np.vstack([y_data]*num_reps)
+        num_reps2 = int(1000/5)
+        new_y_data = np.vstack([y_data]*num_reps2)
         init_bval = np.mean(train, axis=0)
+
                 
         # formulate the ellipsoidal set
         u = lropt.UncertainParameter(m,
@@ -206,16 +211,17 @@ def trainloop(r1,foldername):
         s = cp.Variable(n)
         y = cp.Variable(n)
         Y = cp.Variable((n,m))
-        r = lropt.Parameter(n, data = y_data)        
+        r = lropt.Parameter(n, data = y_data1)        
 
         # formulate objective
         objective = cp.Minimize(L)
 
         # formulate constraints
-        constraints = [-r@y - r@Y@u + (t+h)@s <= L]
-        for i in range(n):
-            constraints += [y[i]+Y[i]@u <= s[i]]
-            constraints += [y[i]<= d[i]+ (Q[i] - Y[i])@u]
+        constraints = [cp.maximum(-r@y - r@Y@u + (t+h)@s - L, y[0]+Y[0]@u -s[0],y[1]+Y[1]@u -s[1],y[2]+Y[2]@u -s[2],y[3]+Y[3]@u -s[3],y[4]+Y[4]@u -s[4],y[5]+Y[5]@u -s[5],y[6]+Y[6]@u -s[6],y[7]+Y[7]@u -s[7], y[8]+Y[8]@u -s[8],y[9]+Y[9]@u -s[9],y[0] - d[0] - (Q[0] - Y[0])@u,y[1] - d[1] - (Q[1] - Y[1])@u,y[2] - d[2] - (Q[2] - Y[2])@u ,y[3] - d[3] - (Q[3] - Y[3])@u,y[4] - d[4] - (Q[4] - Y[4])@u,y[5] - d[5] - (Q[5] - Y[5])@u,y[6] - d[6] - (Q[6] - Y[6])@u,y[7] - d[7] - (Q[7] - Y[7])@u,y[8] - d[8] - (Q[8] - Y[8])@u,y[9] - d[9] - (Q[9] - Y[9])@u ) <= 0]
+        # constraints = [-r@y - r@Y@u + (t+h)@s <= L]
+        # for i in range(n):
+        #     constraints += [y[i]+Y[i]@u <= s[i]]
+        #     constraints += [y[i]<= d[i]+ (Q[i] - Y[i])@u]
         constraints += [np.ones(n)@s == C]
         constraints += [s <=c, s >=0]
         eval_exp = -r@y - r@Y@u + (t+h)@s
@@ -223,15 +229,15 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0005,num_iter=1000, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 0.5, init_mu = 0.5, mu_multiplier=1.01, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 100, lr_gamma = 0.2, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.)
+        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 10*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=-0.0)
         A_fin = result.A
         b_fin = result.b
 
         # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.001, 12, 300), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = newdata)
+        result4 = prob.grid(epslst = np.linspace(0.001, 12, 100), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
-        result5 = prob.grid(epslst = np.linspace(0.001,12, 300), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = newdata)
+        result5 = prob.grid(epslst = np.linspace(0.001,12, 100), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
 
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"inv(N,m,r)_{N,m,r1}", f"inv(N,m,r)_{N,n,r1}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
@@ -254,17 +260,17 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 5
+    R = 10
     n = 10
     m = 4
     # eta = 0.4
-    np.random.seed(25)
-    r = np.random.uniform(2,4,n)
-    y_data = r
-    num_scenarios = 5
+    np.random.seed(27)
+    y_nom = np.random.uniform(2,4,n)
+    y_data = y_nom
+    num_scenarios = 4
     for scene in range(num_scenarios):
         np.random.seed(scene)
-        y_data = np.vstack([y_data,np.maximum(r + np.random.normal(0,0.1,n),0)])
+        y_data = np.vstack([y_data,np.maximum(y_nom + np.random.normal(0,0.1,n),0)])
     np.random.seed(27)
     C = 200
     c = np.random.uniform(30,50,n)
@@ -290,7 +296,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([50,100,300,500,1000,1500,2000,3000,4000,5000])
+    nvals = np.array([1000,2000,3000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])

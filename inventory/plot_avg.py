@@ -28,7 +28,7 @@ parser.add_argument('--foldername', type=str,
 arguments = parser.parse_args()
 foldername = arguments.foldername
 
-nvals = np.array([1000,1500,2000,3000,4000,5000])
+nvals = np.array([1000,2000,3000])
 n = 10
 m = 4
 lower_q = 0.1
@@ -117,19 +117,19 @@ for N in nvals:
         val_re_nom[N].append(dfgrid2['Test_val'][ind_2])
         prob_re_nom[N].append(dfgrid2['Avg_prob_test'][ind_2])
 
-    # plt.figure(figsize = (6,3))
-    # plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
-    # plt.plot(prob_re[N], val_re[N], label = "Reshaped set", color = "tab:orange")
-    # plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
-    # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
-    # # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
-    # # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
-    # plt.xlabel("Prob. of constraint violation")
-    # plt.ylabel("Objective value")
-    # plt.title(f"$m={m}$")
-    # plt.legend()
-    # plt.savefig(foldername + f"{m}_{N}_1", bbox_inches='tight')
-    # plt.show()
+    plt.figure(figsize = (6,3))
+    plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
+    plt.plot(prob_re[N], val_re[N], label = "Reshaped set", color = "tab:orange")
+    plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
+    plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
+    # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
+    # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
+    plt.xlabel("Prob. of constraint violation")
+    plt.ylabel("Objective value")
+    plt.title(f"$m={m}$")
+    plt.legend()
+    plt.savefig(foldername + f"{m}_{N}_1", bbox_inches='tight')
+    plt.show()
 
     plt.figure(figsize = (6,3))
     plt.plot(np.arange(shape), lam_vals[N], label = "lam", color = "tab:blue")

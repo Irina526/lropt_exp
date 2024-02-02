@@ -266,7 +266,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 10
+    R = 20
     n = 5
     # eta = 0.4
     seed = 25
