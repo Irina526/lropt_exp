@@ -198,7 +198,7 @@ def trainloop(r1,foldername):
         newdata = data_modes(1000,m,[1,2,3],seed = 10000+seed)
         num_reps = int(N/5)
         y_data1 = np.vstack([y_data]*num_reps)
-        num_reps2 = int(1000/5)
+        num_reps2 = int(2000/5)
         new_y_data = np.vstack([y_data]*num_reps2)
         init_bval = np.mean(train, axis=0)
 
@@ -229,7 +229,7 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 10*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=-0.0)
+        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 10*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=-0.0)
         A_fin = result.A
         b_fin = result.b
 

@@ -80,8 +80,8 @@ nvals = np.array([1000,2000,3000])
 n = 5
 lower_q = 0.1
 upper_q = 0.9
-etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-# etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30]
+# etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
+etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -120,7 +120,7 @@ for N in nvals:
         values_st = []
         values_re = []
         values_re2 = []
-        for r in range(10):
+        for r in range(20):
             cur_dfgrid = pd.read_csv(foldername + f"results{i}/" + f"gridmv_{N,n,r}.csv")
             cur_dfgrid2 = pd.read_csv(foldername + f"results{i}/" + f"gridre_{N,n,r}.csv")
             values_st0.append(cur_dfgrid['Test_val'][ind_s0])
@@ -156,9 +156,9 @@ for N in nvals:
     plt.figure(figsize = (6,3))
 
     plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
-    # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:orange")
+    # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
     plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
-    # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
+    # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
     paretox, paretoy = pareto_frontier(prob_re_nom[N],val_re_nom[N])
     plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
 

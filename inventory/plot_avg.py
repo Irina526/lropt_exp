@@ -65,10 +65,11 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
+    offset = 8
     for i in [0,1,2,3,4,5,6,7]:
-        dfgrid = pd.read_csv(foldername + f"results{i}/" + f"results/gridmv_{N,m}.csv")
-        dfgrid2= pd.read_csv(foldername + f"results{i}/" + f"results/gridre_{N,m}.csv")
-        dftrain = pd.read_csv(foldername + f"results{i}/" + f"train_{N,m,0}.csv")
+        dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
+        dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
+        dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,m,0}.csv")
         shape = dftrain.shape[0]
         lam_vals[N] = [val[0][0] for val in dftrain['lam_list'][:]]
         print(lam_vals[N])
@@ -84,8 +85,8 @@ for N in nvals:
         values_re = []
         values_re2 = []
         for r in range(10):
-            cur_dfgrid = pd.read_csv(foldername + f"results{i}/" + f"gridmv_{N,m,r}.csv")
-            cur_dfgrid2 = pd.read_csv(foldername + f"results{i}/" + f"gridre_{N,m,r}.csv")
+            cur_dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
+            cur_dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
             values_st0.append(cur_dfgrid['Test_val'][ind_s0])
             values_re0.append(cur_dfgrid2['Test_val'][ind_r0])
             values_st.append(cur_dfgrid['Test_val'][ind_s])
@@ -142,5 +143,5 @@ for N in nvals:
     plt.ylabel("value")
     plt.title(f"$m={m}$")
     plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_etas", bbox_inches='tight')
+    plt.savefig(foldername + f"{m}_{N}_etas_1", bbox_inches='tight')
     plt.show()

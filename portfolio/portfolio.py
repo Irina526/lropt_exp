@@ -208,9 +208,9 @@ def trainloop(r,foldername):
                 seed += 1
             else: 
                 data_gen = True
-        newdata = gen_demand(sig,mu,3000,seed=10000+seed)
+        newdata = gen_demand(sig,mu,8000,seed=10000+seed)
         y_data = np.random.dirichlet(dist, N)
-        new_y_data = np.random.dirichlet(dist, 3000)
+        new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
         init_bval = np.mean(train, axis=0)
                 
@@ -237,7 +237,7 @@ def trainloop(r,foldername):
         df = result.df
         A_fin = result.A
         b_fin = result.b
-        epslst=np.linspace(0.00001, 15, 100)
+        epslst=np.linspace(0.00001, 5, 100)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df

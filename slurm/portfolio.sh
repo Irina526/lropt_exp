@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem-per-cpu=8G
+#SBATCH --mem-per-cpu=10G
 #SBATCH --time=20:00:00
 #SBATCH -o /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/portfolio_test_%A_.txt
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
@@ -13,9 +13,9 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-python portfolio/portfolio.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old26/results16/ --eta 0.30
+python portfolio/portfolio.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old27/results0/ --eta 0.01
 
-# python portfolio/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old25/
+# python portfolio/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old26/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
@@ -60,3 +60,6 @@ python portfolio/portfolio.py --foldername /scratch/gpfs/iywang/learn_robust/lro
 #old23 n=5 r=r+30 all 17 (to comb with old18)
 #old24 iters 3000, epslst 300->100, newdata 20000->3000, batch 10
 #old25 n=5 batch 30
+
+#old26 n=5 batch 40 all 17 all y 3000 test
+#old27 n=5 batch40 8000 test
