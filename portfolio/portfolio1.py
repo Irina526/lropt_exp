@@ -190,8 +190,8 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = (r)*100
-    for N in np.array([50,80,100,300,500,1000,1500,2000,3000,4000,5000]):
+    seed = (r+30)*100
+    for N in np.array([1000,2000]):
         print(N,r)
         # seed += 1
         # s = 0
@@ -209,6 +209,18 @@ def trainloop(r,foldername):
             else: 
                 data_gen = True
         newdata = gen_demand(sig,mu,20000,seed=10000+seed)
+        #y_data = np.random.dirichlet(dist, N)
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+        num_reps = int(N/10)
+        y_data = np.vstack([y_data]*num_reps)
+
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+        num_reps2 = int(20000/10)
+        new_y_data = np.vstack([new_y_data]*num_reps2)
+
+        # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
         init_bval = np.mean(train, axis=0)
                 
@@ -231,16 +243,17 @@ def trainloop(r,foldername):
         # Train A and b
         result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.0)
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
-        result5 = prob.grid(epslst=np.linspace(0.0001, 15, 200), init_A=A_fin, init_b=b_fin, seed=s,
-                            init_alpha=0., test_percentage=test_p, newdata = newdata)
+        epslst=np.linspace(0.00001, 5, 100)
+        result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
+                            init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
-        result4 = prob.grid(epslst=np.linspace(0.0001, 15, 200), init_A=init,
+        result4 = prob.grid(epslst=epslst, init_A=init,
                             init_b=init_bval, seed=s,
-                            init_alpha=0., test_percentage=test_p, newdata= newdata)
+                            init_alpha=0., test_percentage=test_p, newdata=(newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"port(N,m,r)_{N,n,r}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
@@ -263,14 +276,15 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 6
-    n = 5
+    R = 10
+    n = 20
     # eta = 0.4
     seed = 25
     np.random.seed(seed)
     dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
-                    20, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])/10)[:n]
-    y_data = np.random.dirichlet(dist, 10)
+                    20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
+    # y_data = np.random.dirichlet(dist, 10)
+    y_nom = np.random.dirichlet(dist)
     sig, mu = gen_sigmu(n,1)
     njobs = get_n_processes(30)
     print(foldername)
@@ -290,7 +304,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([50,80,100,500,1000,1500,2000,3000,4000,5000])
+    nvals = np.array([1000,2000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])
@@ -298,8 +312,6 @@ if __name__ == '__main__':
         dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test"])
         df_test = pd.read_csv(foldername +f"trainval_{N,n,0}.csv")
         df = pd.read_csv(foldername +f"train_{N,n,0}.csv")
-        # df_test.drop(columns=["step"])
-        # df.drop(columns=["step"])
         for r in range(1,R):
             newgrid = pd.read_csv(foldername +f"gridmv_{N,n,r}.csv")
             newgrid = newgrid.drop(columns=["step","Probability_violations_test"])
@@ -307,10 +319,6 @@ if __name__ == '__main__':
             newgrid2 = pd.read_csv(foldername +f"gridre_{N,n,r}.csv")
             newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test"])
             dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
-            # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
-            # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)
-            # newdf = pd.read_csv(foldername +f"train_{N,n,r}.csv")
-            # df = df.add(newdf.reset_index(), fill_value=0)
 
         if R > 1:
             dfgrid = dfgrid/R
@@ -319,9 +327,6 @@ if __name__ == '__main__':
             # df = df/R
             dfgrid.to_csv(foldername + f"results/gridmv_{N,n}.csv")
             dfgrid2.to_csv(foldername +f"results/gridre_{N,n}.csv")
-            # df_test.to_csv(foldername +f"results/trainval_{N,n}.csv")
-            # df.to_csv(foldername +f"results/train_{N,n}.csv")
-
             plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"results/port(N,m,r)_{N,n}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
             # plot_iters(df, df_test, foldername + f"results/port(N,m)_{N,n}", steps = 10000,logscale = 1)

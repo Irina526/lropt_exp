@@ -209,8 +209,14 @@ def trainloop(r,foldername):
             else: 
                 data_gen = True
         newdata = gen_demand(sig,mu,8000,seed=10000+seed)
-        y_data = np.random.dirichlet(dist, N)
-        new_y_data = np.random.dirichlet(dist, 8000)
+        #y_data = np.random.dirichlet(dist, N)
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(N,n)),0.001)
+        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(8000,n)),0.001)
+        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+
+        # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
         init_bval = np.mean(train, axis=0)
                 
@@ -233,7 +239,7 @@ def trainloop(r,foldername):
         # Train A and b
         result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.0)
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
@@ -266,14 +272,15 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 20
-    n = 5
+    R = 10
+    n = 10
     # eta = 0.4
     seed = 25
     np.random.seed(seed)
     dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
-                    20, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])/10)[:n]
+                    20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
     # y_data = np.random.dirichlet(dist, 10)
+    y_nom = np.random.dirichlet(dist)
     sig, mu = gen_sigmu(n,1)
     njobs = get_n_processes(30)
     print(foldername)

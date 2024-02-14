@@ -178,7 +178,7 @@ def data_modes(N, m, scales, seed):
 
 def trainloop(r1,foldername):
     seed = r1
-    for N in np.array([1000,2000,3000]):
+    for N in np.array([1000]):
         print(N,r1)
         # seed += 1
         # s = 0
@@ -195,10 +195,10 @@ def trainloop(r1,foldername):
                 seed += 1
             else: 
                 data_gen = True
-        newdata = data_modes(1000,m,[1,2,3],seed = 10000+seed)
+        newdata = data_modes(20000,m,[1,2,3],seed = 10000+seed)
         num_reps = int(N/5)
         y_data1 = np.vstack([y_data]*num_reps)
-        num_reps2 = int(2000/5)
+        num_reps2 = int(20000/5)
         new_y_data = np.vstack([y_data]*num_reps2)
         init_bval = np.mean(train, axis=0)
 
@@ -229,15 +229,15 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 10*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=-0.0)
+        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.1)
         A_fin = result.A
         b_fin = result.b
 
         # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.001, 12, 100), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
+        result4 = prob.grid(epslst = np.linspace(0.001, 6, 100), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
-        result5 = prob.grid(epslst = np.linspace(0.001,12, 100), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
+        result5 = prob.grid(epslst = np.linspace(0.001,6, 100), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
 
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"inv(N,m,r)_{N,m,r1}", f"inv(N,m,r)_{N,n,r1}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
@@ -260,9 +260,9 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 10
-    n = 10
-    m = 4
+    R = 7
+    n = 20
+    m = 10
     # eta = 0.4
     np.random.seed(27)
     y_nom = np.random.uniform(2,4,n)
@@ -270,7 +270,7 @@ if __name__ == '__main__':
     num_scenarios = 4
     for scene in range(num_scenarios):
         np.random.seed(scene)
-        y_data = np.vstack([y_data,np.maximum(y_nom + np.random.normal(0,0.1,n),0)])
+        y_data = np.vstack([y_data,np.maximum(y_nom + np.random.normal(0,0.05,n),0)])
     np.random.seed(27)
     C = 200
     c = np.random.uniform(30,50,n)
@@ -296,7 +296,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([1000,2000,3000])
+    nvals = np.array([1000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])

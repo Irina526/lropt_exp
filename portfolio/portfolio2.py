@@ -70,6 +70,7 @@ def plot_iters(dftrain, dftest, title, steps=2000, logscale=True):
         ax1.set_xscale("log")
         ax2.set_xscale("log")
     plt.savefig(title+"_iters", bbox_inches='tight')
+    plt.show()
 
 def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), ind_2 = (0,100), logscale = True, legend = False, zoom = False):
     plt.rcParams.update({
@@ -83,18 +84,20 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
 
     fig, (ax, ax1,ax2) = plt.subplots(1, 3, figsize=(23, 3))
     
-    ax.plot(df_standard['Probability_violations_test'][beg1:end1], df_standard['Test_val'][beg1:end1], color="tab:blue", label=r"Mean-Var set")
-    ax.fill(np.append(df_standard['Probability_violations_test'][beg1:end1],df_standard['Probability_violations_test'][beg1:end1][::-1]), np.append(df_standard['Lower_test'][beg1:end1],df_standard['Upper_test'][beg1:end1][::-1]), color="tab:blue", alpha=0.2)
+    ax.plot(np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], df_standard['Test_val'][beg1:end1], color="tab:blue", label=r"Mean-Var set")
+    ax.fill(np.append(np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1],np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1][::-1]), np.append(df_standard['Lower_test'][beg1:end1],df_standard['Upper_test'][beg1:end1][::-1]), color="tab:blue", alpha=0.2)
 
-    ax.plot(df_reshape['Probability_violations_test'][beg2:end2], df_reshape['Test_val'][beg2:end2], color="tab:orange", label=r"Reshaped set")
-    ax.fill(np.append(df_reshape['Probability_violations_test'][beg2:end2],df_reshape['Probability_violations_test'][beg2:end2][::-1]), np.append(df_reshape['Lower_test'][beg2:end2],df_reshape['Upper_test'][beg2:end2][::-1]), color="tab:orange", alpha=0.2)
+    ax.plot(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], df_reshape['Test_val'][beg2:end2], color="tab:orange", label=r"Reshaped set")
+    ax.fill(np.append(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2],np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2][::-1]), np.append(df_reshape['Lower_test'][beg2:end2],df_reshape['Upper_test'][beg2:end2][::-1]), color="tab:orange", alpha=0.2)
     ax.set_xlabel("Probability of constraint violation")
     ax.axvline(x = 0.03, color = "green", linestyle = "-.",label = r"$\eta = 0.03$")
+    # ax.scatter(0.03,y = np.mean([-0.26913068, -0.26968575, -0.26027287, -0.05857202, -0.15843752]), color = "red")
+    # ax.axhline(y = np.mean([-0.26913068, -0.26968575, -0.26027287, -0.05857202, -0.15843752]), color = "red", linestyle = "-.",label = r"$MRO = 0.03$")
+    
     ax.set_ylabel("Objective value")
     ax.set_title(title1)
     # ax.set_yticks(ticks = [-2e1,0,2e1])
     # ax.set_yticks(ticks = [-1,0,1])
-    # ax.set_ylim([])
     ax.ticklabel_format(style="sci",axis='y',scilimits = (0,0), useMathText=True)
     # ax.legend()
 
@@ -119,13 +122,13 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
     ax1.set_ylabel("Objective value")
     # ax1.legend()
 
-    ax2.plot(df_standard['Coverage_test'][beg1:end1], df_standard['Probability_violations_test'][beg1:end1], color="tab:blue", label=r"Mean-Var set")
+    ax2.plot(df_standard['Coverage_test'][beg1:end1], np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue", label=r"Mean-Var set")
 
-    ax2.plot(df_reshape['Coverage_test'][beg2:end2], df_reshape['Probability_violations_test'][beg2:end2], color="tab:orange", label=r"Reshaped set",alpha = 0.8)
+    ax2.plot(df_reshape['Coverage_test'][beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange", label=r"Reshaped set",alpha = 0.8)
     if dfs:
         for i in range(5):
-            ax2.plot(np.mean(np.vstack(dfs[i+1][0]['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(dfs[i+1][0]['Probability_violations_test']),axis = 1)[beg1:end1], color="tab:blue", linestyle = "-")
-            ax2.plot(np.mean(np.vstack(dfs[i+1][1]['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(dfs[i+1][1]['Probability_violations_test']),axis = 1)[beg2:end2], color = "tab:orange",linestyle = "-")
+            ax2.plot(np.mean(np.vstack(dfs[i+1][0]['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(dfs[i+1][0]['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue", linestyle = "-")
+            ax2.plot(np.mean(np.vstack(dfs[i+1][1]['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(dfs[i+1][1]['Avg_prob_test']),axis = 1)[beg2:end2], color = "tab:orange",linestyle = "-")
     # ax2.plot(np.arange(100)/100, 1 - np.arange(100)/100, color = "red")
     # ax2.set_ylim([-0.05,0.25])
     ax2.axvline(x = 0.8, color = "black",linestyle = ":", label = "0.8 Coverage")
@@ -136,20 +139,26 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
         axins = zoomed_inset_axes(ax2, 6, loc="upper center")
         axins.set_xlim(-0.005, 0.1)
         axins.set_ylim(-0.001,0.035)
-        axins.plot(np.mean(np.vstack(df_standard['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(df_standard['Probability_violations_test']),axis = 1)[beg1:end1], color="tab:blue")
-        axins.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2], np.mean(np.vstack(df_reshape['Probability_violations_test']),axis = 1)[beg2:end2], color="tab:orange",alpha = 0.8)
+        axins.plot(np.mean(np.vstack(df_standard['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue")
+        axins.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange",alpha = 0.8)
         axins.axhline(y = 0.03, color = "green",linestyle = "-.", label = r"$\hat{\eta} = 0.03$")
         axins.set_xticks(ticks=[])
         axins.set_yticks(ticks=[])
         mark_inset(ax2, axins, loc1=3, loc2=4, fc="none", ec="0.5")
     if logscale:
         ax2.set_xscale("log")
+    # ax2.ticklabel_format(style="sci",axis='y',scilimits = (0,0), useMathText=True)
+    # ax2.legend()
     if legend:
         ax2.legend(bbox_to_anchor=(-1.8, -0.6, 0, 0), loc="lower left",
                  borderaxespad=0, ncol=4, fontsize = 24)
+    # lines_labels = [ax.get_legend_handles_labels()]
+    # lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    # fig.legend(lines, labels,loc='upper center', ncol=2,bbox_to_anchor=(0.5, 1.2))
     plt.subplots_adjust(left=0.1)
     plt.savefig(title+"_curves",bbox_inches='tight')
-    # plt.show()
+    plt.show()
+
 
 
 
@@ -181,8 +190,8 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = (r)*100
-    for N in np.array([50,80,100,300,500,1000,1500,2000,3000,4000,5000]):
+    seed = (r+30)*100
+    for N in np.array([1000,2000,3000]):
         print(N,r)
         # seed += 1
         # s = 0
@@ -193,13 +202,27 @@ def trainloop(r,foldername):
                 data = gen_demand(sig,mu,N,seed=seed)
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
-                init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
+                # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
+                init = sc.linalg.sqrtm(np.cov(train.T))
             except Exception as e:
                 seed += 1
             else: 
                 data_gen = True
-        newdata = gen_demand(sig,mu,8000,seed=10000+seed)
-        init_bval = -init@np.mean(train, axis=0)
+        newdata = gen_demand(sig,mu,20000,seed=10000+seed)
+        #y_data = np.random.dirichlet(dist, N)
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(5,n)),0.001)
+        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+        num_reps = int(N/5)
+        y_data = np.vstack([y_data]*num_reps)
+
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(5,n)),0.001)
+        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+        num_reps2 = int(20000/5)
+        new_y_data = np.vstack([new_y_data]*num_reps2)
+
+        # new_y_data = np.random.dirichlet(dist, 8000)
+        # init_bval = -init@np.mean(train, axis=0)
+        init_bval = np.mean(train, axis=0)
                 
         u = lropt.UncertainParameter(n,
                                 uncertainty_set=lropt.Ellipsoidal(p=2,
@@ -218,18 +241,19 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.01, num_iter=4000, optimizer="SGD",
+        result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.0)
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
-        result5 = prob.grid(epslst=np.linspace(0.001, 8, 200), init_A=A_fin, init_b=b_fin, seed=s,
-                            init_alpha=0., test_percentage=test_p, newdata = newdata)
+        epslst=np.linspace(0.00001, 5, 100)
+        result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
+                            init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
-        result4 = prob.grid(epslst=np.linspace(0.001, 8, 200), init_A=init,
+        result4 = prob.grid(epslst=epslst, init_A=init,
                             init_b=init_bval, seed=s,
-                            init_alpha=0., test_percentage=test_p, newdata= newdata)
+                            init_alpha=0., test_percentage=test_p, newdata=(newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"port(N,m,r)_{N,n,r}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
@@ -248,16 +272,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foldername', type=str,
                         default="portfolio/", metavar='N')
+    parser.add_argument('--eta', type=float, default=0.05)
     arguments = parser.parse_args()
     foldername = arguments.foldername
-    R = 6
+    eta = arguments.eta
+    R = 20
     n = 5
-    eta = 0.4
-    seed = 15
+    # eta = 0.4
+    seed = 25
     np.random.seed(seed)
     dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
-                    20, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])/10)[:n]
-    y_data = np.random.dirichlet(dist, 10)
+                    20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
+    # y_data = np.random.dirichlet(dist, 10)
+    y_nom = np.random.dirichlet(dist)
     sig, mu = gen_sigmu(n,1)
     njobs = get_n_processes(30)
     print(foldername)
@@ -277,27 +304,21 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([50,80,100,500,1000,1500,2000,3000,4000,5000])
+    nvals = np.array([1000,2000,3000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
-        dfgrid = dfgrid.drop(columns=["step"])
+        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])
         dfgrid2 = pd.read_csv(foldername +f"gridre_{N,n,0}.csv")
-        dfgrid2 = dfgrid2.drop(columns=["step"])
+        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test"])
         df_test = pd.read_csv(foldername +f"trainval_{N,n,0}.csv")
         df = pd.read_csv(foldername +f"train_{N,n,0}.csv")
-        # df_test.drop(columns=["step"])
-        # df.drop(columns=["step"])
         for r in range(1,R):
             newgrid = pd.read_csv(foldername +f"gridmv_{N,n,r}.csv")
-            newgrid = newgrid.drop(columns=["step"])
+            newgrid = newgrid.drop(columns=["step","Probability_violations_test"])
             dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
             newgrid2 = pd.read_csv(foldername +f"gridre_{N,n,r}.csv")
-            newgrid2 = newgrid2.drop(columns=["step"])
+            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test"])
             dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
-            # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
-            # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)
-            # newdf = pd.read_csv(foldername +f"train_{N,n,r}.csv")
-            # df = df.add(newdf.reset_index(), fill_value=0)
 
         if R > 1:
             dfgrid = dfgrid/R
@@ -306,20 +327,17 @@ if __name__ == '__main__':
             # df = df/R
             dfgrid.to_csv(foldername + f"results/gridmv_{N,n}.csv")
             dfgrid2.to_csv(foldername +f"results/gridre_{N,n}.csv")
-            # df_test.to_csv(foldername +f"results/trainval_{N,n}.csv")
-            # df.to_csv(foldername +f"results/train_{N,n}.csv")
-
             plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"results/port(N,m,r)_{N,n}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
             # plot_iters(df, df_test, foldername + f"results/port(N,m)_{N,n}", steps = 10000,logscale = 1)
 
-        ind_s = np.absolute(np.mean(np.vstack(dfgrid['Probability_violations_test']),axis = 1)-0).argmin()
+        ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.05).argmin()
         val_st.append(dfgrid['Test_val'][ind_s])
-        prob_st.append(dfgrid['Probability_violations_test'][ind_s])
+        prob_st.append(dfgrid['Avg_prob_test'][ind_s])
 
-        ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Probability_violations_test']),axis = 1)-0).argmin()
+        ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.05).argmin()
         val_re.append(dfgrid2['Test_val'][ind_r])
-        prob_re.append(dfgrid2['Probability_violations_test'][ind_r])
+        prob_re.append(dfgrid2['Avg_prob_test'][ind_r])
 
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 3))

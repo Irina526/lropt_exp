@@ -77,11 +77,11 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 
 
 nvals = np.array([1000,2000,3000])
-n = 5
+n = 10
 lower_q = 0.1
 upper_q = 0.9
 # etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30]
+etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30,0.40]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -94,7 +94,11 @@ val_re_nom_upper = {}
 val_re_nom_lower = {}
 val_re_nom = {}
 prob_re_nom = {}
+mu_vals = {}
+lam_vals = {}
 for N in nvals:
+    mu_vals[N] = []
+    lam_vals[N] = []
     val_st[N] = []
     val_re[N] = []
     prob_st[N] = []
@@ -107,51 +111,69 @@ for N in nvals:
     val_re_nom_upper[N] = []
     val_re_nom_lower[N] = []
     prob_re_nom[N] = []
+    # for i in range(len(etas)):
+    # first = 0
+    offset = 0
     for i in range(len(etas)):
-        dfgrid = pd.read_csv(foldername + f"results{i}/" + f"results/gridmv_{N,n}.csv")
-        dfgrid2= pd.read_csv(foldername + f"results{i}/" + f"results/gridre_{N,n}.csv")
-        ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
-        ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.0).argmin()
-        ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-etas[i]).argmin()
-        ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-etas[i]).argmin()
-        ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Eps']),axis = 1)-1).argmin()
+        # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
+        # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
+        dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
+        shape = dftrain.shape[0]
+        lam_vals[N] = [float(val[8:-4]) for val in dftrain['lam_list']]
+        mu_vals[N] = np.array(dftrain['mu'])
         values_st0 = []
         values_re0 = []
         values_st = []
         values_re = []
         values_re2 = []
-        for r in range(20):
-            cur_dfgrid = pd.read_csv(foldername + f"results{i}/" + f"gridmv_{N,n,r}.csv")
-            cur_dfgrid2 = pd.read_csv(foldername + f"results{i}/" + f"gridre_{N,n,r}.csv")
-            values_st0.append(cur_dfgrid['Test_val'][ind_s0])
-            values_re0.append(cur_dfgrid2['Test_val'][ind_r0])
-            values_st.append(cur_dfgrid['Test_val'][ind_s])
-            values_re.append(cur_dfgrid2['Test_val'][ind_r])
-            values_re2.append(cur_dfgrid2['Test_val'][ind_2])
+        tp_prob_st = []
+        tp_prob_re = []
+        tp_prob_st0 = []
+        tp_prob_re0 = []
+        tp_prob_re2 = []
+        for r in range(10):
+            dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
+            dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
+            ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
+            ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.0).argmin()
+            ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-etas[i]).argmin()
+            ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-etas[i]).argmin()
+            ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Eps']),axis = 1)-1).argmin()
+            values_st0.append(dfgrid['Test_val'][ind_s0])
+            values_re0.append(dfgrid2['Test_val'][ind_r0])
+            values_st.append(dfgrid['Test_val'][ind_s])
+            values_re.append(dfgrid2['Test_val'][ind_r])
+            values_re2.append(dfgrid2['Test_val'][ind_2])
+            tp_prob_st.append(dfgrid['Avg_prob_test'][ind_s])
+            tp_prob_re.append(dfgrid2['Avg_prob_test'][ind_r])
+            tp_prob_st0.append(dfgrid['Avg_prob_test'][ind_s0])
+            tp_prob_re0.append(dfgrid2['Avg_prob_test'][ind_r0])
+            tp_prob_re2.append(dfgrid2['Avg_prob_test'][ind_2])
         if i==0:
+            # first=1
             val_st_lower[N].append(np.quantile(values_st0,lower_q))
             val_st_upper[N].append(np.quantile(values_st0,upper_q))
-            val_st[N].append(dfgrid['Test_val'][ind_s0])
-            prob_st[N].append(dfgrid['Avg_prob_test'][ind_s0])
+            val_st[N].append(np.mean(values_st0))
+            prob_st[N].append(np.mean(tp_prob_st0))
             
             val_re_lower[N].append(np.quantile(values_re0,lower_q))
             val_re_upper[N].append(np.quantile(values_re0,upper_q))
-            val_re[N].append(dfgrid2['Test_val'][ind_r0])
-            prob_re[N].append(dfgrid2['Avg_prob_test'][ind_r0])
+            val_re[N].append(np.mean(values_re0))
+            prob_re[N].append(np.mean(tp_prob_re0))
         
         val_st_lower[N].append(np.quantile(values_st,lower_q))
         val_st_upper[N].append(np.quantile(values_st,upper_q))
-        val_st[N].append(dfgrid['Test_val'][ind_s])
-        prob_st[N].append(dfgrid['Avg_prob_test'][ind_s])
+        val_st[N].append(np.mean(values_st))
+        prob_st[N].append(np.mean(tp_prob_st))
         
         val_re_lower[N].append(np.quantile(values_re,lower_q))
         val_re_upper[N].append(np.quantile(values_re,upper_q))
-        val_re[N].append(dfgrid2['Test_val'][ind_r])
-        prob_re[N].append(dfgrid2['Avg_prob_test'][ind_r])
+        val_re[N].append(np.mean(values_re))
+        prob_re[N].append(np.mean(tp_prob_re))
         val_re_nom_upper[N].append(np.quantile(values_re2,upper_q))
         val_re_nom_lower[N].append(np.quantile(values_re2,lower_q))
-        val_re_nom[N].append(dfgrid2['Test_val'][ind_2])
-        prob_re_nom[N].append(dfgrid2['Avg_prob_test'][ind_2])
+        val_re_nom[N].append(np.mean(values_re2))
+        prob_re_nom[N].append(np.mean(tp_prob_re2))
 
     plt.figure(figsize = (6,3))
 
