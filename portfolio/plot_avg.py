@@ -76,12 +76,12 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
     return p_frontX, p_frontY, p_frontZ
 
 
-nvals = np.array([1000,2000,3000])
+nvals = np.array([1000,2000])
 n = 10
 lower_q = 0.1
 upper_q = 0.9
 # etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30,0.40]
+etas = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25, 0.30]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -113,7 +113,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 0
+    offset = 1
     for i in range(len(etas)):
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
