@@ -195,13 +195,17 @@ def trainloop(r1,foldername):
                 seed += 1
             else: 
                 data_gen = True
+        # newdata = data_modes(5000,m,[1,2,3],seed = 10000+seed)
+        # y_data = np.maximum(y_norm + np.random.normal(0,0.05,(N,n)),0)
+        # new_y_data = np.maximum(y_norm + np.random.normal(0,0.05,(5000,n)),0)
+        # init_bval = np.mean(train, axis=0)
+
         newdata = data_modes(20000,m,[1,2,3],seed = 10000+seed)
-        num_reps = int(N/5)
+        num_reps = int(N/10)
         y_data1 = np.vstack([y_data]*num_reps)
-        num_reps2 = int(20000/5)
+        num_reps2 = int(20000/10)
         new_y_data = np.vstack([y_data]*num_reps2)
         init_bval = np.mean(train, axis=0)
-
                 
         # formulate the ellipsoidal set
         u = lropt.UncertainParameter(m,
@@ -229,7 +233,7 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = True, num_random_init=6, parallel = True, eta = eta, kappa=0.1)
+        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 5*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.5)
         A_fin = result.A
         b_fin = result.b
 
@@ -260,14 +264,14 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 7
-    n = 20
-    m = 10
+    R = 15
+    n = 10
+    m = 8
     # eta = 0.4
     np.random.seed(27)
     y_nom = np.random.uniform(2,4,n)
     y_data = y_nom
-    num_scenarios = 4
+    num_scenarios = 9
     for scene in range(num_scenarios):
         np.random.seed(scene)
         y_data = np.vstack([y_data,np.maximum(y_nom + np.random.normal(0,0.05,n),0)])

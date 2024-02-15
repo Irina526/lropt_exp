@@ -2,7 +2,7 @@
 #SBATCH --job-name=invtest
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=15
 #SBATCH --mem-per-cpu=10G
 #SBATCH --time=20:00:00
 #SBATCH -o /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/inv_test_%A_.txt
@@ -13,7 +13,7 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-python inventory/inventory.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old39/results0/ --eta 0.01
+python inventory/inventory1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old39/results15/ --eta 0.30
 
 # python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old38/
 
@@ -109,4 +109,4 @@ python inventory/inventory.py --foldername /scratch/gpfs/iywang/learn_robust/lro
 #old37 m10n20 7r init, no parallel, with parallel
 #old38 m4 10r 5*init no parallel 5repy k=0.5, init
 
-#old39 m4 20r 5*init no parallel 10repy k=0.5
+#old39 m4 20r 5*init no parallel 10repy k=0.5, m8 15r
