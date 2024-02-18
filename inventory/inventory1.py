@@ -233,7 +233,7 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 5*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.5)
+        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = 5*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
         A_fin = result.A
         b_fin = result.b
 
@@ -264,9 +264,9 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 15
+    R = 20
     n = 10
-    m = 8
+    m = 4
     # eta = 0.4
     np.random.seed(27)
     y_nom = np.random.uniform(2,4,n)
@@ -303,19 +303,19 @@ if __name__ == '__main__':
     nvals = np.array([1000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
-        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])
+        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])
         dfgrid2 = pd.read_csv(foldername +f"gridre_{N,m,0}.csv")
-        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test"])
+        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values"])
         df_test = pd.read_csv(foldername +f"trainval_{N,m,0}.csv")
         df = pd.read_csv(foldername +f"train_{N,m,0}.csv")
         # df_test.drop(columns=["step"])
         # df.drop(columns=["step"])
         for r in range(1,R):
             newgrid = pd.read_csv(foldername +f"gridmv_{N,m,r}.csv")
-            newgrid = newgrid.drop(columns=["step","Probability_violations_test"])
+            newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values"])
             dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
             newgrid2 = pd.read_csv(foldername +f"gridre_{N,m,r}.csv")
-            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test"])
+            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
             dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
             # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
             # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)

@@ -191,7 +191,7 @@ def g_tch(t, x, y, u):
 
 def trainloop(r,foldername):
     seed = (r+30)*100
-    for N in np.array([1000,2000,3000]):
+    for N in np.array([1000,2000]):
         print(N,r)
         # seed += 1
         # s = 0
@@ -208,13 +208,17 @@ def trainloop(r,foldername):
                 seed += 1
             else: 
                 data_gen = True
-        newdata = gen_demand(sig,mu,8000,seed=10000+seed)
+        newdata = gen_demand(sig,mu,20000,seed=10000+seed)
         #y_data = np.random.dirichlet(dist, N)
-        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(N,n)),0.001)
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
         y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+        num_reps = int(N/10)
+        y_data = np.vstack([y_data]*num_reps)
 
-        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(8000,n)),0.001)
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
         new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+        num_reps2 = int(20000/10)
+        new_y_data = np.vstack([new_y_data]*num_reps2)
 
         # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
@@ -272,8 +276,8 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 10
-    n = 10
+    R = 20
+    n = 5
     # eta = 0.4
     seed = 25
     np.random.seed(seed)
@@ -300,20 +304,20 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([1000,2000,3000])
+    nvals = np.array([1000,2000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
-        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test"])
+        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])
         dfgrid2 = pd.read_csv(foldername +f"gridre_{N,n,0}.csv")
-        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test"])
+        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values"])
         df_test = pd.read_csv(foldername +f"trainval_{N,n,0}.csv")
         df = pd.read_csv(foldername +f"train_{N,n,0}.csv")
         for r in range(1,R):
             newgrid = pd.read_csv(foldername +f"gridmv_{N,n,r}.csv")
-            newgrid = newgrid.drop(columns=["step","Probability_violations_test"])
+            newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values"])
             dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
             newgrid2 = pd.read_csv(foldername +f"gridre_{N,n,r}.csv")
-            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test"])
+            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
             dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
 
         if R > 1:

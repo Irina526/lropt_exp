@@ -30,7 +30,7 @@ foldername = arguments.foldername
 
 nvals = np.array([1000])
 # n = 20
-m = 4
+m = 8
 lower_q = 0.1
 upper_q = 0.9
 etas = [0.01,0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
@@ -65,7 +65,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 0
+    offset = 8
     for i in [0,1,2,3,4,5,6,7]:
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
@@ -83,7 +83,7 @@ for N in nvals:
         tp_prob_st0 = []
         tp_prob_re0 = []
         tp_prob_re2 = []
-        for r in [0,1,2,3,5,6,7,9]:
+        for r in range(15):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
@@ -138,7 +138,7 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$m={m}$")
     plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_nopar5", bbox_inches='tight')
+    plt.savefig(foldername + f"{m}_{N}_nopar", bbox_inches='tight')
     plt.show()
 
     plt.figure(figsize = (6,3))
@@ -148,5 +148,5 @@ for N in nvals:
     plt.ylabel("value")
     plt.title(f"$m={m}$")
     plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_etas_nopar5", bbox_inches='tight')
+    plt.savefig(foldername + f"{m}_{N}_etas_nopar", bbox_inches='tight')
     plt.show()

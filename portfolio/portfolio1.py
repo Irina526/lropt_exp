@@ -212,12 +212,12 @@ def trainloop(r,foldername):
         #y_data = np.random.dirichlet(dist, N)
         y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
         y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
-        num_reps = int(N/5)
+        num_reps = int(N/10)
         y_data = np.vstack([y_data]*num_reps)
 
         new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
         new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
-        num_reps2 = int(20000/5)
+        num_reps2 = int(20000/10)
         new_y_data = np.vstack([new_y_data]*num_reps2)
 
         # new_y_data = np.random.dirichlet(dist, 8000)
