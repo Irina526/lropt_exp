@@ -233,15 +233,16 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
+        result = prob.train(lr = 0.0001,num_iter=1000, num_iter_size = 200, lr_size= 0.01, train_size = True, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
         A_fin = result.A
         b_fin = result.b
+        eps_fin = result.eps
 
         # Grid search epsilon
         result4 = prob.grid(epslst = np.linspace(0.001, 6, 100), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
-        result5 = prob.grid(epslst = np.linspace(0.001,6, 100), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
+        result5 = prob.grid(epslst = np.linspace(0.001,6, 100), init_A = eps_fin*A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
 
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"inv(N,m,r)_{N,m,r1}", f"inv(N,m,r)_{N,n,r1}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
