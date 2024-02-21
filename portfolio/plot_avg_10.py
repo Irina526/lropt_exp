@@ -194,7 +194,7 @@ for N in nvals:
     paretoyupper[3] += -0.01
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     
-    plt.vlines(ymin=-0.75, ymax=-0.58, x=0.03, linestyles=":",
+    plt.vlines(ymin=-0.72, ymax=-0.58, x=0.03, linestyles=":",
            color="tab:red", label=r"$\hat{\eta}=0.03$") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
