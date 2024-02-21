@@ -178,7 +178,7 @@ def data_modes(N, m, scales, seed):
 
 def trainloop(r1,foldername):
     seed = r1
-    for N in np.array([500]):
+    for N in np.array([1000]):
         print(N,r1)
         # seed += 1
         # s = 0
@@ -210,7 +210,7 @@ def trainloop(r1,foldername):
                 
         # formulate the ellipsoidal set
         u = lropt.UncertainParameter(m,
-                                        uncertainty_set = lropt.MRO(K=N, p=2, data=data, train=True))
+                                        uncertainty_set = lropt.MRO(K=50, p=2, data=data, train=True))
         # formulate cvxpy variable
         L = cp.Variable()
         s = cp.Variable(n)

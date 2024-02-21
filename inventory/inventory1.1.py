@@ -54,14 +54,15 @@ def plot_iters(dftrain, dftest, title, steps=2000, logscale=True):
     len_train = len(dftrain["Violations_train"])
     ax1.plot(np.arange(0,len_train,10), dftest["Violations_test"][:steps],
              label="Out-of-sample empirical CVaR")
-    ax1.plot(dftrain["Violations_train"][:steps],
+    ax1.plot(np.arange(len_train),dftrain["Violations_train"][:steps],
              label="In-sample empirical CVaR", linestyle="--")
 
     ax1.set_xlabel("Iterations")
     ax1.hlines(xmin=0, xmax=dftrain["Violations_train"][:steps].shape[0],
                y=-0.0, linestyles="--", color="black", label="Target threshold: 0")
     ax1.legend()
-    ax2.plot(dftest["Test_val"][:steps], label="Objective value")
+    len_test = len(dftest["Test_val"])
+    ax2.plot(np.arange(len_test), dftest["Test_val"][:steps], label="Objective value")
     ax2.set_xlabel("Iterations")
     ax2.ticklabel_format(style="sci", axis='y',
                          scilimits=(0, 0), useMathText=True)
@@ -233,7 +234,7 @@ def trainloop(r1,foldername):
         prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
         # solve
         # seed 1, 
-        result = prob.train(lr = 0.0001,num_iter=1000, num_iter_size = 200, lr_size= 0.01, train_size = True, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
+        result = prob.train(lr = 0.0001,num_iter=1000, num_iter_size = 200, lr_size= 0.0001, train_size = True, optimizer = "SGD", seed = seed, init_A = 5*init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
         A_fin = result.A
         b_fin = result.b
         eps_fin = result.eps

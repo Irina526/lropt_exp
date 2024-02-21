@@ -30,7 +30,7 @@ foldername = arguments.foldername
 
 nvals = np.array([1000])
 # n = 20
-m = 8
+m = 4
 lower_q = 0.1
 upper_q = 0.9
 etas = [0.01,0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
@@ -83,7 +83,7 @@ for N in nvals:
         tp_prob_st0 = []
         tp_prob_re0 = []
         tp_prob_re2 = []
-        for r in range(15):
+        for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
@@ -132,13 +132,13 @@ for N in nvals:
     plt.plot(prob_re[N], val_re[N], label = "Reshaped set", color = "tab:orange")
     plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
     plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
-    plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
-    plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
+    # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
+    # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
     plt.xlabel("Prob. of constraint violation")
     plt.ylabel("Objective value")
     plt.title(f"$m={m}$")
     plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_nopar", bbox_inches='tight')
+    plt.savefig(foldername + f"{m}_{N}_nopar_1", bbox_inches='tight')
     plt.show()
 
     plt.figure(figsize = (6,3))

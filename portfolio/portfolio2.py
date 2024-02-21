@@ -160,8 +160,6 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
     plt.show()
 
 
-
-
 def gen_sigmu(n,seed = 0):
     np.random.seed(seed)
     F = np.random.normal(size = (n,2))
@@ -179,6 +177,14 @@ def gen_demand(sig,mu,N,seed=399):
     d_train = np.random.multivariate_normal(mu,sig, N)
     return d_train
 
+def gen_demand_intro(N, seed):
+    np.random.seed(seed)
+    sig = np.array([[0.5, -0.3], [-0.3, 0.4]])
+    mu = np.array((0.3, 0.3))
+    d_train = np.random.multivariate_normal(mu, sig, N)
+    # d_train = np.exp(d_train)
+    return d_train
+
 def f_tch(t, x, y, u):
     # x is a tensor that represents the cp.Variable x.
     return t + 0.2*torch.linalg.vector_norm(x-y, 1)
@@ -191,15 +197,15 @@ def g_tch(t, x, y, u):
 
 def trainloop(r,foldername):
     seed = (r+30)*100
-    for N in np.array([1000,2000]):
+    for N in np.array([5000]):
         print(N,r)
         # seed += 1
         # s = 0
         data_gen = False
-        test_p = 0.2
+        test_p = 0.9
         while not data_gen:
             try: 
-                data = gen_demand(sig,mu,N,seed=seed)
+                data = gen_demand_intro(N,seed=seed)
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
                 # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
@@ -208,20 +214,22 @@ def trainloop(r,foldername):
                 seed += 1
             else: 
                 data_gen = True
-        newdata = gen_demand(sig,mu,20000,seed=10000+seed)
+        newdata = gen_demand_intro(4500,seed=10000+seed)
         #y_data = np.random.dirichlet(dist, N)
-        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
-        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+        # y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        # y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
         num_reps = int(N/10)
-        y_data = np.vstack([y_data]*num_reps)
+        y_data = np.vstack([y_nom]*num_reps)
 
-        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
-        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
-        num_reps2 = int(20000/10)
-        new_y_data = np.vstack([new_y_data]*num_reps2)
+        # new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        # new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+        num_reps2 = int(4500/10)
+        new_y_data = np.vstack([y_nom]*num_reps2)
 
         # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
+        np.random.seed(15)
+        init = np.random.rand(n,2)
         init_bval = np.mean(train, axis=0)
                 
         u = lropt.UncertainParameter(n,
@@ -241,9 +249,9 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.001, num_iter=3000, optimizer="SGD",
-                            seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
+        result = prob.train(lr=0.001, num_iter=2000, optimizer="SGD",
+                            seed=s, init_A=init, init_b=init_bval, init_lam=0.5, init_mu=0.1,
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = False, num_random_init=8, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
@@ -276,15 +284,15 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 10
-    n = 20
+    R = 20
+    n = 2
     # eta = 0.4
     seed = 25
     np.random.seed(seed)
     dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
                     20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
     # y_data = np.random.dirichlet(dist, 10)
-    y_nom = np.random.dirichlet(dist)
+    y_nom = np.random.dirichlet(dist,10)
     sig, mu = gen_sigmu(n,1)
     njobs = get_n_processes(30)
     print(foldername)
@@ -304,7 +312,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([1000,2000])
+    nvals = np.array([5000])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])
