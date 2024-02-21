@@ -232,9 +232,9 @@ def trainloop(r,foldername):
         t = cp.Variable()
         y = lropt.Parameter(n, data=y_data)
 
-        objective = cp.Minimize(t + 0.2*cp.norm(x - y, 1))
+        objective = cp.Minimize(t + cp.norm(x - y, 1))
         constraints = [-x@u <= t, cp.sum(x) == 1, x >= 0]
-        eval_exp = -x @ u + 0.2*cp.norm(x-y, 1)
+        eval_exp = -x @ u + cp.norm(x-y, 1)
 
         prob = lropt.RobustProblem(objective, constraints, eval_exp=eval_exp)
         s = seed
@@ -277,15 +277,15 @@ if __name__ == '__main__':
     foldername = arguments.foldername
     eta = arguments.eta
     R = 20
-    n = 5
+    n = 10
     # eta = 0.4
     seed = 25
-    np.random.seed(seed)
     sig, mu = gen_sigmu(n,1)
+    np.random.seed(seed)
     # dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
     #                 20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
-    dist = mu
     # y_data = np.random.dirichlet(dist, 10)
+    dist = mu
     y_nom = np.random.dirichlet(dist)
     njobs = get_n_processes(30)
     print(foldername)

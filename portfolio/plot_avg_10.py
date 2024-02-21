@@ -116,6 +116,7 @@ for N in nvals:
     # first = 0
     offset = 0
     for i in range(len(etas)):
+        print(etas[i])
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
         dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
@@ -132,7 +133,7 @@ for N in nvals:
         tp_prob_st0 = []
         tp_prob_re0 = []
         tp_prob_re2 = []
-        for r in range(20):
+        for r in [4]:
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
@@ -150,8 +151,14 @@ for N in nvals:
             tp_prob_st0.append(dfgrid['Avg_prob_test'][ind_s0])
             tp_prob_re0.append(dfgrid2['Avg_prob_test'][ind_r0])
             tp_prob_re2.append(dfgrid2['Avg_prob_test'][ind_2])
+
+            print("re", dfgrid2["var_values"][ind_2])
+            print("st", dfgrid["var_values"][ind_s])
+
         if i==0:
             # first=1
+            print("re0", dfgrid2["var_values"][ind_r0])
+            print("st0", dfgrid["var_values"][ind_s0])
             val_st_lower[N].append(np.quantile(values_st0,lower_q))
             val_st_upper[N].append(np.quantile(values_st0,upper_q))
             val_st[N].append(np.mean(values_st0))
@@ -176,12 +183,15 @@ for N in nvals:
         val_re_nom[N].append(np.mean(values_re2))
         prob_re_nom[N].append(np.mean(tp_prob_re2))
 
-        print(np.mean(np.array(tp_prob_st) >= 0.03))
-        print(np.mean(np.array(tp_prob_re) >= 0.03))
-        print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
-        print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
-        print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
+        # print(np.mean(np.array(tp_prob_st) >= 0.03))
+        # print(np.mean(np.array(tp_prob_re) >= 0.03))
+        # print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
+        # print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
+        # print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
     plt.figure(figsize = (6,3))
+
+    print(prob_re_nom[N],val_re_nom[N])
+    print(prob_st[N])
 
     plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
     # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
@@ -192,6 +202,8 @@ for N in nvals:
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][:-1],val_re_nom_lower[N][:-1], val_re_nom_upper[N][:-1])
     paretoyupper[2] += 0.02
     paretoyupper[3] += -0.01
+    print(paretoy)
+    print(paretox)
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     
     plt.vlines(ymin=-0.72, ymax=-0.58, x=0.03, linestyles=":",
@@ -200,6 +212,6 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$m={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}_1.pdf", bbox_inches='tight')
     plt.show()
 

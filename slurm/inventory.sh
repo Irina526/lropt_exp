@@ -2,8 +2,8 @@
 #SBATCH --job-name=invtest
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
-#SBATCH --mem-per-cpu=1G
+#SBATCH --cpus-per-task=20
+#SBATCH --mem-per-cpu=20G
 #SBATCH --time=20:00:00
 #SBATCH -o /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/inv_test_%A_.txt
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
@@ -13,9 +13,9 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-# python inventory/inventory_init4.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old44/results17/ --eta 0.03
+python inventory/inventory1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old41/results3/ --eta 0.03
 
-python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old45/
+# python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old45/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
@@ -112,7 +112,7 @@ python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lrop
 #old39 m4 20r 5*init no parallel 10repy k=0.5, m8 15r (CURRENT)
 
 #old40 m8 nopar r20 5*init k=0.,/ init k=0. (CURRENT)
-#old41 m4 nopar r5 init I mro K=200 k=0./, m8 r5 init I 
+#old41 m4 nopar r5 init I mro K=200 k=0./, m8 r5 init I / K=800 m8 m4
 
 #old42 m8 r20 init k=0 traineps 200iters lr0.01 no par, m4
 #old43 m4 r20 5*init k=0. lr0.0001, m8

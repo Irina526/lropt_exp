@@ -210,7 +210,7 @@ def trainloop(r1,foldername):
                 
         # formulate the ellipsoidal set
         u = lropt.UncertainParameter(m,
-                                        uncertainty_set = lropt.MRO(K=50, p=2, data=data, train=True))
+                                        uncertainty_set = lropt.MRO(K=train.shape[0], p=2, data=train, train=True))
         # formulate cvxpy variable
         L = cp.Variable()
         s = cp.Variable(n)
@@ -285,7 +285,7 @@ if __name__ == '__main__':
     h = np.random.uniform(0.1,0.3,n)
     njobs = get_n_processes(30)
     print(foldername)
-    Parallel(n_jobs=njobs)(
+    Parallel(n_jobs=1)(
         delayed(trainloop)(r, foldername) for r in range(R))
     # for r in range(R):
     #     trainloop(r,foldername)
@@ -301,37 +301,37 @@ if __name__ == '__main__':
     # val_re = []
     # prob_st = []
     # prob_re = []
-    # nvals = np.array([500])
-    # for N in nvals:
-    #     dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
-    #     dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])
-    #     dfgrid2 = pd.read_csv(foldername +f"gridre_{N,m,0}.csv")
-    #     dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values"])
-    #     df_test = pd.read_csv(foldername +f"trainval_{N,m,0}.csv")
-    #     df = pd.read_csv(foldername +f"train_{N,m,0}.csv")
-    #     # df_test.drop(columns=["step"])
-    #     # df.drop(columns=["step"])
-    #     for r in range(1,R):
-    #         newgrid = pd.read_csv(foldername +f"gridmv_{N,m,r}.csv")
-    #         newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values"])
-    #         dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
-    #         newgrid2 = pd.read_csv(foldername +f"gridre_{N,m,r}.csv")
-    #         newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
-    #         dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
-    #         # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
-    #         # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)
-    #         # newdf = pd.read_csv(foldername +f"train_{N,n,r}.csv")
-    #         # df = df.add(newdf.reset_index(), fill_value=0)
+    nvals = np.array([1000])
+    for N in nvals:
+        dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
+        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
+        # dfgrid2 = pd.read_csv(foldername +f"gridre_{N,m,0}.csv")
+        # dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
+        # df_test = pd.read_csv(foldername +f"trainval_{N,m,0}.csv")
+        # df = pd.read_csv(foldername +f"train_{N,m,0}.csv")
+        # df_test.drop(columns=["step"])
+        # df.drop(columns=["step"])
+        for r in range(1,R):
+            newgrid = pd.read_csv(foldername +f"gridmv_{N,m,r}.csv")
+            newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
+            dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
+            # newgrid2 = pd.read_csv(foldername +f"gridre_{N,m,r}.csv")
+            # newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
+            # dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
+            # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
+            # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)
+            # newdf = pd.read_csv(foldername +f"train_{N,n,r}.csv")
+            # df = df.add(newdf.reset_index(), fill_value=0)
 
-    #     if R > 1:
-    #         dfgrid = dfgrid/R
-    #         dfgrid2 = dfgrid2/R
-    #         # df_test = df_test/R
-    #         # df = df/R
-    #         dfgrid.to_csv(foldername + f"results/gridmv_{N,m}.csv")
-    #         dfgrid2.to_csv(foldername +f"results/gridre_{N,m}.csv")
-    #         # df_test.to_csv(foldername +f"results/trainval_{N,n}.csv")
-    #         # df.to_csv(foldername +f"results/train_{N,n}.csv")
+        if R > 1:
+            dfgrid = dfgrid/R
+            # dfgrid2 = dfgrid2/R
+            # df_test = df_test/R
+            # df = df/R
+            dfgrid.to_csv(foldername + f"results/gridmv_{N,m}.csv")
+            # dfgrid2.to_csv(foldername +f"results/gridre_{N,m}.csv")
+            # df_test.to_csv(foldername +f"results/trainval_{N,n}.csv")
+            # df.to_csv(foldername +f"results/train_{N,n}.csv")
 
     #         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"results/inv(N,m,r)_{N,n}", f"inv(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 

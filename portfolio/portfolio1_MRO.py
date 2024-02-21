@@ -161,98 +161,109 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
 
 
 
-def data_scaled(N, m, scale, seed):
+def gen_sigmu(n,seed = 0):
     np.random.seed(seed)
-    R = np.vstack([np.random.normal(
-        i*0.03*scale, np.sqrt((0.02**2+(i*0.1)**2)), N) for i in range(1, m+1)])
-    return (R.transpose())
+    F = np.random.normal(size = (n,2))
+    sig = 0.1*F@(F.T)
+    mu = np.random.uniform(0.5,1,n)
+    return sig, mu
 
-def data_modes(N, m, scales, seed):
-    modes = len(scales)
-    d = np.zeros((N+100, m))
-    weights = int(np.ceil(N/modes))
-    for i in range(modes):
-        d[i*weights:(i+1)*weights,
-          :] = data_scaled(weights, m, scales[i], seed)
-    return d[0:N, :]
+def gen_demand(sig,mu,N,seed=399):
+    # np.random.seed(0)
+    # F = np.random.normal(size = (n,2))
+    # # sig = np.random.uniform(0,0.9,(n,n))
+    # sig = 0.1*F@(F.T)
+    # mu = np.random.uniform(0.5,1,n)
+    np.random.seed(seed)
+    d_train = np.random.multivariate_normal(mu,sig, N)
+    return d_train
 
-def trainloop(r1,foldername):
-    seed = r1
+def f_tch(t, x, y, u):
+    # x is a tensor that represents the cp.Variable x.
+    return t + 0.2*torch.linalg.vector_norm(x-y, 1)
+
+def g_tch(t, x, y, u):
+    # x,y,u are tensors that represent the cp.Variable x and cp.Parameter y and u.
+    # The cp.Constant c is converted to a tensor
+    return -x @ u.T - t
+
+
+def trainloop(r,foldername):
+    seed = (r+30)*100
     for N in np.array([1000]):
-        print(N,r1)
+        print(N,r)
         # seed += 1
         # s = 0
         data_gen = False
         test_p = 0.2
         while not data_gen:
             try: 
-                data = data_modes(N,m,[1,2,3],seed = seed)
+                data = gen_demand(sig,mu,N,seed=seed)
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
-                # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(m)*0.0001)+ np.cov(train.T))))
-                # init = np.real(sc.linalg.sqrtm(np.cov(train.T)))
-                init = np.eye(m)
+                # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
+                init = sc.linalg.sqrtm(np.cov(train.T))
             except Exception as e:
                 seed += 1
             else: 
                 data_gen = True
-        # newdata = data_modes(5000,m,[1,2,3],seed = 10000+seed)
-        # y_data = np.maximum(y_norm + np.random.normal(0,0.05,(N,n)),0)
-        # new_y_data = np.maximum(y_norm + np.random.normal(0,0.05,(5000,n)),0)
-        # init_bval = np.mean(train, axis=0)
-
-        newdata = data_modes(20000,m,[1,2,3],seed = 10000+seed)
+        newdata = gen_demand(sig,mu,20000,seed=10000+seed)
+        #y_data = np.random.dirichlet(dist, N)
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
         num_reps = int(N/10)
-        y_data1 = np.vstack([y_data]*num_reps)
+        y_data = np.vstack([y_data]*num_reps)
+
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
         num_reps2 = int(20000/10)
-        new_y_data = np.vstack([y_data]*num_reps2)
-        init_bval = np.zeros(m)
+        new_y_data = np.vstack([new_y_data]*num_reps2)
+
+        # new_y_data = np.random.dirichlet(dist, 8000)
+        # init_bval = -init@np.mean(train, axis=0)
+        init = np.eye(n)
+        init_bval = np.zeros(n)
                 
-        # formulate the ellipsoidal set
-        u = lropt.UncertainParameter(m,
-                                        uncertainty_set = lropt.MRO(K=train.shape[0], p=2, data=train, train=True))
-        # formulate cvxpy variable
-        L = cp.Variable()
-        s = cp.Variable(n)
-        y = cp.Variable(n)
-        Y = cp.Variable((n,m))
-        r = lropt.Parameter(n, data = y_data1)        
+        u = lropt.UncertainParameter(n,
+                                uncertainty_set=lropt.MRO(K=train.shape[0],p=2,train=True,
+                                                            data=train))
+        # Formulate the Robust Problem
+        x = cp.Variable(n)
+        t = cp.Variable()
+        y = lropt.Parameter(n, data=y_data)
 
-        # formulate objective
-        objective = cp.Minimize(L)
+        objective = cp.Minimize(t + 0.2*cp.norm(x - y, 1))
+        constraints = [-x@u <= t, cp.sum(x) == 1, x >= 0]
+        eval_exp = -x @ u + 0.2*cp.norm(x-y, 1)
 
-        # formulate constraints
-        constraints = [cp.maximum(-r@y - r@Y@u + (t+h)@s - L, y[0]+Y[0]@u -s[0],y[1]+Y[1]@u -s[1],y[2]+Y[2]@u -s[2],y[3]+Y[3]@u -s[3],y[4]+Y[4]@u -s[4],y[5]+Y[5]@u -s[5],y[6]+Y[6]@u -s[6],y[7]+Y[7]@u -s[7], y[8]+Y[8]@u -s[8],y[9]+Y[9]@u -s[9],y[0] - d[0] - (Q[0] - Y[0])@u,y[1] - d[1] - (Q[1] - Y[1])@u,y[2] - d[2] - (Q[2] - Y[2])@u ,y[3] - d[3] - (Q[3] - Y[3])@u,y[4] - d[4] - (Q[4] - Y[4])@u,y[5] - d[5] - (Q[5] - Y[5])@u,y[6] - d[6] - (Q[6] - Y[6])@u,y[7] - d[7] - (Q[7] - Y[7])@u,y[8] - d[8] - (Q[8] - Y[8])@u,y[9] - d[9] - (Q[9] - Y[9])@u ) <= 0]
-        # constraints = [-r@y - r@Y@u + (t+h)@s <= L]
-        # for i in range(n):
-        #     constraints += [y[i]+Y[i]@u <= s[i]]
-        #     constraints += [y[i]<= d[i]+ (Q[i] - Y[i])@u]
-        constraints += [np.ones(n)@s == C]
-        constraints += [s <=c, s >=0]
-        eval_exp = -r@y - r@Y@u + (t+h)@s
-        # formulate Robust Problem
-        prob = lropt.RobustProblem(objective, constraints,eval_exp = eval_exp )
-        # solve
-        # seed 1, 
-        # result = prob.train(lr = 0.001,num_iter=5, optimizer = "SGD", seed = seed, init_A = init, init_b = init_bval, init_lam = 2.0, init_mu =2.0, mu_multiplier=1.02, init_alpha = -0.0, test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.5, position = False, random_init = False, num_random_init=6, parallel = True, eta = eta, kappa=0.)
+        prob = lropt.RobustProblem(objective, constraints, eval_exp=eval_exp)
+        s = seed
+        #s=0,2,4,6,0
+        #iters = 5000
+        # Train A and b
+        # result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
+        #                     seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
+        #                     mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
+        # df = result.df
         # A_fin = result.A
         # b_fin = result.b
-
-        # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.001, 8, 20), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
+        epslst=np.linspace(0.00001, 8, 100)
+        # result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
+        #                     init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
+        # dfgrid2 = result5.df
+        result4 = prob.grid(epslst=epslst, init_A=init,
+                            init_b=init_bval, seed=s,
+                            init_alpha=0., test_percentage=test_p, newdata=(newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
-        # result5 = prob.grid(epslst = np.linspace(0.001,5, 20), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
-        # dfgrid2 = result5.df
+        plot_coverage_all(dfgrid,None,None, foldername + f"port(N,m,r)_{N,n,r}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
-        plot_coverage_all(dfgrid,None,None, foldername + f"inv(N,m,r)_{N,m,r1}", f"inv(N,m,r)_{N,n,r1}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
+        # plot_iters(df, result.df_test, foldername + f"port(N,m)_{N,n,r}", steps = 10000,logscale = 1)
 
-        # plot_iters(result.df, result.df_test, foldername + f"inv(N,m)_{N,m,r1}", steps = 10000,logscale = 1)
-
-        dfgrid.to_csv(foldername + f"gridmv_{N,m,r1}.csv")
-        # dfgrid2.to_csv(foldername +f"gridre_{N,m,r1}.csv")
-        # result.df_test.to_csv(foldername +f"trainval_{N,m,r1}.csv")
-        # result.df.to_csv(foldername +f"train_{N,m,r1}.csv")
+        dfgrid.to_csv(foldername + f"gridmv_{N,n,r}.csv")
+        # dfgrid2.to_csv(foldername +f"gridre_{N,n,r}.csv")
+        # result.df_test.to_csv(foldername +f"trainval_{N,n,r}.csv")
+        # result.df.to_csv(foldername +f"train_{N,n,r}.csv")
 
 
 
@@ -260,32 +271,25 @@ if __name__ == '__main__':
     print("START")
     parser = argparse.ArgumentParser()
     parser.add_argument('--foldername', type=str,
-                        default="inventory/", metavar='N')
+                        default="portfolio/", metavar='N')
     parser.add_argument('--eta', type=float, default=0.05)
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 5
+    R = 20
     n = 10
-    m = 8
     # eta = 0.4
-    np.random.seed(27)
-    y_nom = np.random.uniform(2,4,n)
-    y_data = y_nom
-    num_scenarios = 9
-    for scene in range(num_scenarios):
-        np.random.seed(scene)
-        y_data = np.vstack([y_data,np.maximum(y_nom + np.random.normal(0,0.05,n),0)])
-    np.random.seed(27)
-    C = 200
-    c = np.random.uniform(30,50,n)
-    Q = np.random.uniform(-0.2,0.2,(n,m))
-    d = np.random.uniform(10,20,n)
-    t = np.random.uniform(0.1,0.3,n)
-    h = np.random.uniform(0.1,0.3,n)
+    seed = 25
+    np.random.seed(seed)
+    sig, mu = gen_sigmu(n,1)
+    # dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
+    #                 20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
+    dist = mu
+    # y_data = np.random.dirichlet(dist, 10)
+    y_nom = np.random.dirichlet(dist)
     njobs = get_n_processes(30)
     print(foldername)
-    Parallel(n_jobs=1)(
+    Parallel(n_jobs=njobs)(
         delayed(trainloop)(r, foldername) for r in range(R))
     # for r in range(R):
     #     trainloop(r,foldername)
@@ -297,43 +301,34 @@ if __name__ == '__main__':
 
     # dftemp.to_csv(foldername + '/df.csv')
 
-    # val_st = []
-    # val_re = []
-    # prob_st = []
-    # prob_re = []
+    val_st = []
+    val_re = []
+    prob_st = []
+    prob_re = []
     nvals = np.array([1000])
     for N in nvals:
-        dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
+        dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
-        # dfgrid2 = pd.read_csv(foldername +f"gridre_{N,m,0}.csv")
+        # dfgrid2 = pd.read_csv(foldername +f"gridre_{N,n,0}.csv")
         # dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
-        # df_test = pd.read_csv(foldername +f"trainval_{N,m,0}.csv")
-        # df = pd.read_csv(foldername +f"train_{N,m,0}.csv")
-        # df_test.drop(columns=["step"])
-        # df.drop(columns=["step"])
+        # df_test = pd.read_csv(foldername +f"trainval_{N,n,0}.csv")
+        # df = pd.read_csv(foldername +f"train_{N,n,0}.csv")
         for r in range(1,R):
-            newgrid = pd.read_csv(foldername +f"gridmv_{N,m,r}.csv")
+            newgrid = pd.read_csv(foldername +f"gridmv_{N,n,r}.csv")
             newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
             dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
-            # newgrid2 = pd.read_csv(foldername +f"gridre_{N,m,r}.csv")
-            # newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
+            # newgrid2 = pd.read_csv(foldername +f"gridre_{N,n,r}.csv")
+            # newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
             # dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
-            # newdf_test = pd.read_csv(foldername +f"trainval_{N,n,r}.csv")
-            # df_test = df_test.add(newdf_test.reset_index(), fill_value=0)
-            # newdf = pd.read_csv(foldername +f"train_{N,n,r}.csv")
-            # df = df.add(newdf.reset_index(), fill_value=0)
 
         if R > 1:
             dfgrid = dfgrid/R
             # dfgrid2 = dfgrid2/R
             # df_test = df_test/R
             # df = df/R
-            dfgrid.to_csv(foldername + f"results/gridmv_{N,m}.csv")
-            # dfgrid2.to_csv(foldername +f"results/gridre_{N,m}.csv")
-            # df_test.to_csv(foldername +f"results/trainval_{N,n}.csv")
-            # df.to_csv(foldername +f"results/train_{N,n}.csv")
-
-    #         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"results/inv(N,m,r)_{N,n}", f"inv(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
+            dfgrid.to_csv(foldername + f"results/gridmv_{N,n}.csv")
+            # dfgrid2.to_csv(foldername +f"results/gridre_{N,n}.csv")
+            plot_coverage_all(dfgrid,None,None, foldername + f"results/port(N,m,r)_{N,n}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
     #         # plot_iters(df, df_test, foldername + f"results/port(N,m)_{N,n}", steps = 10000,logscale = 1)
 
@@ -358,4 +353,4 @@ if __name__ == '__main__':
     # ax2.set_xlabel("Number of Samples")
     # ax2.set_title(f"m:{n} OOS Prob Violations")
     # ax2.legend()
-    # plt.savefig(foldername + f"results/m:{m}_varyN",bbox_inches='tight')
+    # plt.savefig(foldername + f"results/m:{n}_varyN",bbox_inches='tight')
