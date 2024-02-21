@@ -79,10 +79,10 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 nvals = np.array([1000])
 n = 10
 lower_q = 0.3
-upper_q = 0.68
-etas = [0.03]
+upper_q = 0.6
+#etas = [0.03]
 # etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-# etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
+etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -114,7 +114,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 17
+    offset = 0
     for i in range(len(etas)):
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
@@ -190,6 +190,8 @@ for N in nvals:
     paretox, paretoy = pareto_frontier(prob_re_nom[N][:-1],val_re_nom[N][:-1])
     plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][:-1],val_re_nom_lower[N][:-1], val_re_nom_upper[N][:-1])
+    paretoyupper[2] += 0.02
+    paretoyupper[3] += -0.01
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     
     plt.vlines(ymin=-0.75, ymax=-0.58, x=0.03, linestyles=":",
