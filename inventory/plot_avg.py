@@ -150,10 +150,10 @@ for N in nvals:
     #        color="black") 
     
     plt.vlines(ymin=-465, ymax=-457, x=0.026, linestyles=":",
-           color="tab:red", label=r"$\hat{\eta}=0.026,0.052$") 
-    plt.vlines(ymin=-465, ymax=-457, x=0.052, linestyles=":",
+           color="tab:red", label=r"$\hat{\eta}=0.026,0.054$") 
+    plt.vlines(ymin=-465, ymax=-457, x=0.054, linestyles=":",
            color="tab:red") 
-    plt.hlines(xmin=0.026, xmax=0.052, y=-461.42, linestyles="--",
+    plt.hlines(xmin=0.026, xmax=0.054, y=-461.42, linestyles="--",
            color="black") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
