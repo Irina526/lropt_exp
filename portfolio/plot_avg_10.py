@@ -79,7 +79,7 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 nvals = np.array([1000])
 n = 10
 lower_q = 0.3
-upper_q = 0.6
+upper_q = 0.7
 #etas = [0.03]
 # etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
 etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
@@ -121,7 +121,7 @@ for N in nvals:
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
         dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
         shape = dftrain.shape[0]
-        lam_vals[N] = [float(val[8:-4]) for val in dftrain['lam_list']]
+        lam_vals[N] = [val[0] for val in dftrain['lam_list']]
         mu_vals[N] = np.array(dftrain['mu'])
         values_st0 = []
         values_re0 = []
@@ -133,7 +133,7 @@ for N in nvals:
         tp_prob_st0 = []
         tp_prob_re0 = []
         tp_prob_re2 = []
-        for r in [4]:
+        for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
@@ -188,30 +188,42 @@ for N in nvals:
         # print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
         # print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
         # print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
-    plt.figure(figsize = (6,3))
 
     print(prob_re_nom[N],val_re_nom[N])
     print(prob_st[N])
 
+    dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,0}.csv")
+    mro_probs = dfgrid["Avg_prob_test"]
+    mro_vals = dfgrid["Test_val"]
+    for r in range(1,20):
+        dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
+        mro_probs = np.vstack([mro_probs, dfgrid["Avg_prob_test"]])
+        mro_vals = np.vstack([mro_vals, dfgrid["Test_val"]])
+    
+
+    plt.figure(figsize = (6,3))
     plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
     # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
     plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
     # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
-    paretox, paretoy = pareto_frontier(prob_re_nom[N][:-1],val_re_nom[N][:-1])
+
+    plt.plot(np.mean(mro_probs,axis=0),np.mean(mro_vals, axis=0), label = "Wass DRO", color = "tab:green" )
+    plt.fill_between(np.mean(mro_probs,axis=0),np.quantile(mro_vals,lower_q, axis=0),np.quantile(mro_vals,upper_q, axis=0), color = "tab:green", alpha=0.3)
+    paretox, paretoy = pareto_frontier(prob_re_nom[N][1:-1],val_re_nom[N][1:-1])
     plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
-    paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][:-1],val_re_nom_lower[N][:-1], val_re_nom_upper[N][:-1])
-    paretoyupper[2] += 0.02
-    paretoyupper[3] += -0.01
+    paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][1:-1],val_re_nom_lower[N][1:-1], val_re_nom_upper[N][1:-1])
+    # paretoyupper[2] += 0.02
+    # paretoyupper[3] += -0.01
     print(paretoy)
     print(paretox)
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     
-    plt.vlines(ymin=-0.72, ymax=-0.58, x=0.03, linestyles=":",
+    plt.vlines(ymin=-0.8, ymax=-0.6, x=0.03, linestyles=":",
            color="tab:red", label=r"$\hat{\eta}=0.03$") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
-    plt.title(f"$m={n}$")
+    plt.title(f"$n={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}_1.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
     plt.show()
 

@@ -30,7 +30,7 @@ foldername = arguments.foldername
 
 nvals = np.array([1000])
 # n = 20
-m = 4
+m = 8
 lower_q = 0.2
 upper_q = 0.8
 #etas = [0.02]
@@ -66,7 +66,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 8
+    offset = 0
     for i in range(len(etas)):
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
@@ -89,8 +89,8 @@ for N in nvals:
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_train']),axis = 1)-0.0).argmin()
             ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_train']),axis = 1)-0.0).argmin()
-            ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_train']),axis = 1)-etas[i]).argmin()
-            ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_train']),axis = 1)-etas[i]).argmin()
+            ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_train']),axis = 1)-(etas[i]-0.01)).argmin()
+            ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_train']),axis = 1)-(etas[i]-0.01)).argmin()
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Eps']),axis = 1)-1).argmin()
             values_st0.append(dfgrid['Test_val'][ind_s0])
             values_re0.append(dfgrid2['Test_val'][ind_r0])
@@ -128,26 +128,38 @@ for N in nvals:
         val_re_nom[N].append(np.mean(values_re2))
         prob_re_nom[N].append(np.mean(tp_prob_re2))
 
-        print(np.mean(np.array(tp_prob_st) >= 0.03))
-        print(np.mean(np.array(tp_prob_re) >= 0.03))
-        print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
-        print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
-        print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
+        print(etas[i])
+        print(np.mean(np.array(tp_prob_st) >= etas[i]))
+        print(np.mean(np.array(tp_prob_re) >= etas[i]))
+        print(val_st[N],prob_st[N])
+        print(val_re[N],prob_re[N])
+        print(val_re_nom[N],prob_re_nom[N])
 
     plt.figure(figsize = (6,3))
     plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
     plt.plot(prob_re[N], val_re[N], label = "Reshaped set", color = "tab:orange")
     plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
     plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
-    plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
-    plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
-    # plt.vlines(ymin=-455, ymax=-451, x=0.03, linestyles=":",
-    #        color="tab:red", label=r"$\hat{\eta}=0.03$") 
+    # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
+    # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
+    # plt.vlines(ymin=-455, ymax=-451, x=0.024, linestyles=":",
+    #        color="tab:red", label=r"$\hat{\eta}=0.024,0.06$") 
+    # plt.vlines(ymin=-455, ymax=-451, x=0.06, linestyles=":",
+    #        color="tab:red") 
+    # plt.hlines(xmin=0.024, xmax=0.06, y=-452.88, linestyles="--",
+    #        color="black") 
+    
+    plt.vlines(ymin=-465, ymax=-457, x=0.026, linestyles=":",
+           color="tab:red", label=r"$\hat{\eta}=0.026,0.052$") 
+    plt.vlines(ymin=-465, ymax=-457, x=0.052, linestyles=":",
+           color="tab:red") 
+    plt.hlines(xmin=0.026, xmax=0.052, y=-461.42, linestyles="--",
+           color="black") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
     plt.title(f"$m={m}$")
     plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_nopar_1.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{m}_{N}_nopar_2.pdf", bbox_inches='tight')
     plt.show()
 
     # plt.figure(figsize = (6,3))

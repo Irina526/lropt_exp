@@ -186,11 +186,11 @@ def f_tch(t, x, y, u):
 def g_tch(t, x, y, u):
     # x,y,u are tensors that represent the cp.Variable x and cp.Parameter y and u.
     # The cp.Constant c is converted to a tensor
-    return -x @ u.T - t
+    return -x @ u - t
 
 
 def trainloop(r,foldername):
-    seed = (r+30)*100
+    seed = r
     for N in np.array([1000]):
         print(N,r)
         # seed += 1

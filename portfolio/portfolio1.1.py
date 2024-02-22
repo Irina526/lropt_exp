@@ -190,7 +190,7 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = (r+30)*100
+    seed = r
     for N in np.array([1000]):
         print(N,r)
         # seed += 1
@@ -222,31 +222,47 @@ def trainloop(r,foldername):
 
         # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
-        init_bval = np.mean(train, axis=0)
+        init_bval = np.zeros(n)
                 
         u = lropt.UncertainParameter(n,
-                                uncertainty_set=lropt.Ellipsoidal(p=2,
-                                                            data=data))
+                                uncertainty_set=lropt.MRO(K=100,p=2,train=True,
+                                                            data=train))
         # Formulate the Robust Problem
         x = cp.Variable(n)
         t = cp.Variable()
         y = lropt.Parameter(n, data=y_data)
 
-        objective = cp.Minimize(t + cp.norm(x - y, 1))
+        objective = cp.Minimize(t + 0.2*cp.norm(x - y, 1))
         constraints = [-x@u <= t, cp.sum(x) == 1, x >= 0]
-        eval_exp = -x @ u + cp.norm(x-y, 1)
+        eval_exp = -x @ u + 0.2*cp.norm(x-y, 1)
 
         prob = lropt.RobustProblem(objective, constraints, eval_exp=eval_exp)
         s = seed
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
+        result = prob.train(lr=0.01, num_iter=500, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
+        
+        # Formulate the DRO Robust Problem
+        u = lropt.UncertainParameter(n,
+                                uncertainty_set=lropt.MRO(K=train.shape[0],p=2,train=True,
+                                                            data=train))
+        x = cp.Variable(n)
+        t = cp.Variable()
+        y = lropt.Parameter(n, data=y_data)
+
+        objective = cp.Minimize(t + 0.2*cp.norm(x - y, 1))
+        constraints = [-x@u <= t, cp.sum(x) == 1, x >= 0]
+        eval_exp = -x @ u + 0.2*cp.norm(x-y, 1)
+
+        prob = lropt.RobustProblem(objective, constraints, eval_exp=eval_exp)
+        s = seed
+
         epslst=np.linspace(0.00001, 5, 100)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)

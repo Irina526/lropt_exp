@@ -239,7 +239,7 @@ def trainloop(r1,foldername):
         # b_fin = result.b
 
         # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.001, 8, 20), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
+        result4 = prob.grid(epslst = np.linspace(0.001, 8, 5), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
         # result5 = prob.grid(epslst = np.linspace(0.001,5, 20), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 5
+    R = 1
     n = 10
     m = 8
     # eta = 0.4

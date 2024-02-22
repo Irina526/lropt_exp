@@ -189,7 +189,7 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = (r+30)*100
+    seed = r
     for N in np.array([1000]):
         print(N,r)
         # seed += 1
