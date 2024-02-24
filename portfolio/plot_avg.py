@@ -81,7 +81,7 @@ n = 5
 lower_q = 0.3
 upper_q = 0.6
 # etas = [0.03]
-# etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
+#etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
 etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 val_st = {}
 val_re = {}
@@ -137,6 +137,8 @@ for N in nvals:
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
             ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
             ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.0).argmin()
+            ind_s01 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.002).argmin()
+            ind_r01 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.002).argmin()
             ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-etas[i]).argmin()
             ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-etas[i]).argmin()
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Eps']),axis = 1)-1).argmin()
@@ -196,6 +198,7 @@ for N in nvals:
 
     plt.plot(np.mean(mro_probs,axis=0)[4:],np.mean(mro_vals, axis=0)[4:], label = "Wass DRO", color = "tab:green" )
     plt.fill_between(np.mean(mro_probs,axis=0)[4:],np.quantile(mro_vals,lower_q, axis=0)[4:],np.quantile(mro_vals,upper_q, axis=0)[4:], color = "tab:green", alpha=0.3)
+
     # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
     # plt.plot(prob_re_nom[N], val_re_nom[N], label = "Reshaped", color = "tab:orange")
     # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:orange", alpha=0.3)
@@ -204,8 +207,8 @@ for N in nvals:
     plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][:-1],val_re_nom_lower[N][:-1], val_re_nom_upper[N][:-1])
     
-    paretoyupper[3] += -0.01
-    paretoyupper[0] += 0.04
+    # paretoyupper[3] += -0.01
+    # paretoyupper[0] += 0.04
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     
     # plt.vlines(ymin=-0.75, ymax=-0.58, x=0.03, linestyles=":",

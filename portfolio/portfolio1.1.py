@@ -190,7 +190,7 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = r
+    seed = 10+r
     for N in np.array([1000]):
         print(N,r)
         # seed += 1
@@ -225,7 +225,7 @@ def trainloop(r,foldername):
         init_bval = np.zeros(n)
                 
         u = lropt.UncertainParameter(n,
-                                uncertainty_set=lropt.MRO(K=100,p=2,train=True,
+                                uncertainty_set=lropt.MRO(K=20,p=2,train=True,
                                                             data=train))
         # Formulate the Robust Problem
         x = cp.Variable(n)
@@ -241,9 +241,9 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.01, num_iter=500, optimizer="SGD",
+        result = prob.train(lr=0.001, num_iter=600, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=4, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     foldername = arguments.foldername
     eta = arguments.eta
     R = 20
-    n = 10
+    n = 5
     # eta = 0.4
     seed = 25
     sig, mu = gen_sigmu(n,1)

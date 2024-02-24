@@ -160,6 +160,8 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
     plt.show()
 
 
+
+
 def gen_sigmu(n,seed = 0):
     np.random.seed(seed)
     F = np.random.normal(size = (n,2))
@@ -177,14 +179,6 @@ def gen_demand(sig,mu,N,seed=399):
     d_train = np.random.multivariate_normal(mu,sig, N)
     return d_train
 
-def gen_demand_intro(N, seed):
-    np.random.seed(seed)
-    sig = np.array([[0.5, -0.3], [-0.3, 0.4]])
-    mu = np.array((0.3, 0.3))
-    d_train = np.random.multivariate_normal(mu, sig, N)
-    # d_train = np.exp(d_train)
-    return d_train
-
 def f_tch(t, x, y, u):
     # x is a tensor that represents the cp.Variable x.
     return t + 0.2*torch.linalg.vector_norm(x-y, 1)
@@ -196,45 +190,44 @@ def g_tch(t, x, y, u):
 
 
 def trainloop(r,foldername):
-    seed = (r+30)*100
-    for N in np.array([5000]):
+    seed = 10+r
+    for N in np.array([100]):
         print(N,r)
         # seed += 1
         # s = 0
         data_gen = False
-        test_p = 0.9
+        test_p = 0.2
         while not data_gen:
             try: 
-                data = gen_demand_intro(N,seed=seed)
+                data = gen_demand(sig,mu,N,seed=seed)
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
                 # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
-                init = sc.linalg.sqrtm(np.cov(train.T))
+                # init = sc.linalg.sqrtm(np.cov(train.T))
             except Exception as e:
                 seed += 1
             else: 
                 data_gen = True
-        newdata = gen_demand_intro(4500,seed=10000+seed)
+        newdata = gen_demand(sig,mu,20000,seed=10000+seed)
         #y_data = np.random.dirichlet(dist, N)
-        # y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
-        # y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
+        y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        y_data = np.diag(1/np.sum(y_data, axis=1))@y_data
         num_reps = int(N/10)
-        y_data = np.vstack([y_nom]*num_reps)
+        y_data = np.vstack([y_data]*num_reps)
 
-        # new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
-        # new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
-        num_reps2 = int(4500/10)
-        new_y_data = np.vstack([y_nom]*num_reps2)
+        new_y_data = np.maximum(y_nom + np.random.normal(0,0.05,(10,n)),0.001)
+        new_y_data = np.diag(1/np.sum(new_y_data, axis=1))@new_y_data
+        num_reps2 = int(20000/10)
+        new_y_data = np.vstack([new_y_data]*num_reps2)
 
         # new_y_data = np.random.dirichlet(dist, 8000)
         # init_bval = -init@np.mean(train, axis=0)
-        np.random.seed(15)
-        init = np.random.rand(n,2)
-        init_bval = np.mean(train, axis=0)
+        init = np.eye(n)
+        init_bval = np.zeros(n)
                 
         u = lropt.UncertainParameter(n,
-                                uncertainty_set=lropt.Ellipsoidal(p=2,
-                                                            data=data))
+                                uncertainty_set=lropt.MRO(K=40,p=2,train=True,
+                                                            data=train))
         # Formulate the Robust Problem
         x = cp.Variable(n)
         t = cp.Variable()
@@ -249,12 +242,28 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.001, num_iter=2000, optimizer="SGD",
-                            seed=s, init_A=init, init_b=init_bval, init_lam=0.5, init_mu=0.1,
-                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = False, num_random_init=8, parallel = True, eta = eta, kappa=0.0)
+        result = prob.train(lr=0.00001, num_iter=200, optimizer="SGD",
+                            seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
+                            mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.2, position = False, random_init = False, num_random_init=4, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
+        
+        # Formulate the DRO Robust Problem
+        u = lropt.UncertainParameter(n,
+                                uncertainty_set=lropt.MRO(K=train.shape[0],p=2,train=True,
+                                                            data=train))
+        x = cp.Variable(n)
+        t = cp.Variable()
+        y = lropt.Parameter(n, data=y_data)
+
+        objective = cp.Minimize(t + 0.2*cp.norm(x - y, 1))
+        constraints = [-x@u <= t, cp.sum(x) == 1, x >= 0]
+        eval_exp = -x @ u + 0.2*cp.norm(x-y, 1)
+
+        prob = lropt.RobustProblem(objective, constraints, eval_exp=eval_exp)
+        s = seed
+
         epslst=np.linspace(0.00001, 5, 100)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
@@ -285,15 +294,16 @@ if __name__ == '__main__':
     foldername = arguments.foldername
     eta = arguments.eta
     R = 20
-    n = 2
+    n = 10
     # eta = 0.4
     seed = 25
-    np.random.seed(seed)
-    dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
-                    20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
-    # y_data = np.random.dirichlet(dist, 10)
-    y_nom = np.random.dirichlet(dist,10)
     sig, mu = gen_sigmu(n,1)
+    np.random.seed(seed)
+    # dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
+    #                 20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
+    # y_data = np.random.dirichlet(dist, 10)
+    dist = mu
+    y_nom = np.random.dirichlet(dist)
     njobs = get_n_processes(30)
     print(foldername)
     Parallel(n_jobs=njobs)(
@@ -312,20 +322,20 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([5000])
+    nvals = np.array([100])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
-        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])
+        dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
         dfgrid2 = pd.read_csv(foldername +f"gridre_{N,n,0}.csv")
-        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values"])
+        dfgrid2 = dfgrid2.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
         df_test = pd.read_csv(foldername +f"trainval_{N,n,0}.csv")
         df = pd.read_csv(foldername +f"train_{N,n,0}.csv")
         for r in range(1,R):
             newgrid = pd.read_csv(foldername +f"gridmv_{N,n,r}.csv")
-            newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values"])
+            newgrid = newgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
             dfgrid = dfgrid.add(newgrid.reset_index(), fill_value=0)
             newgrid2 = pd.read_csv(foldername +f"gridre_{N,n,r}.csv")
-            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values"])
+            newgrid2 = newgrid2.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
             dfgrid2 = dfgrid2.add(newgrid2.reset_index(), fill_value=0)
 
         if R > 1:

@@ -76,7 +76,7 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
     return p_frontX, p_frontY, p_frontZ
 
 
-nvals = np.array([1000])
+nvals = np.array([100])
 n = 10
 lower_q = 0.3
 upper_q = 0.7

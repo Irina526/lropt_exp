@@ -13,9 +13,9 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-# python inventory/inventory1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old41/results3/ --eta 0.03
+# python inventory/inventory2.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/results17/ --eta 0.30
 
-python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old45/
+python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
@@ -116,5 +116,7 @@ python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lrop
 
 #old42 m8 r20 init k=0 traineps 200iters lr0.01 no par, m4
 #old43 m4 r20 5*init k=0. lr0.0001, m8
-#old44 m8 init, m4 (CURRENT) + 0.03 with train
-#old45 m8 init, lr=0.001, m4  (CURRENT)
+#old44 m8 init lr=0.0001, m4 (CURRENT) + 0.03 with train
+#old45 m8 init lr=0.001, m4  (CURRENT)
+
+#old46 m8 init // m4 N=100 //mro

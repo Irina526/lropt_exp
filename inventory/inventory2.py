@@ -178,7 +178,7 @@ def data_modes(N, m, scales, seed):
 
 def trainloop(r1,foldername):
     seed = r1
-    for N in np.array([1000]):
+    for N in np.array([100]):
         print(N,r1)
         # seed += 1
         # s = 0
@@ -239,7 +239,7 @@ def trainloop(r1,foldername):
         # b_fin = result.b
 
         # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.001, 8, 5), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
+        result4 = prob.grid(epslst = np.linspace(0.01, 1.5, 10), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
         # result5 = prob.grid(epslst = np.linspace(0.001,5, 20), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 1
+    R = 5
     n = 10
     m = 8
     # eta = 0.4
@@ -285,8 +285,14 @@ if __name__ == '__main__':
     h = np.random.uniform(0.1,0.3,n)
     njobs = get_n_processes(30)
     print(foldername)
-    Parallel(n_jobs=1)(
-        delayed(trainloop)(r, foldername) for r in range(R))
+    trainloop(0,foldername)
+    trainloop(1,foldername)
+    trainloop(2,foldername)
+    trainloop(3,foldername)
+    trainloop(4,foldername)
+    
+    # Parallel(n_jobs=1)(
+    #     delayed(trainloop)(r, foldername) for r in range(R))
     # for r in range(R):
     #     trainloop(r,foldername)
     # dftemp = results[0][2]
@@ -301,7 +307,7 @@ if __name__ == '__main__':
     # val_re = []
     # prob_st = []
     # prob_re = []
-    nvals = np.array([1000])
+    nvals = np.array([100])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])

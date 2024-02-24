@@ -179,7 +179,7 @@ def data_modes(N, m, scales, seed):
 
 def trainloop(r1,foldername):
     seed = r1
-    for N in np.array([1000]):
+    for N in np.array([100]):
         print(N,r1)
         # seed += 1
         # s = 0
@@ -302,7 +302,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([1000])
+    nvals = np.array([100])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,m,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values"])

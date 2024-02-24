@@ -28,9 +28,9 @@ parser.add_argument('--foldername', type=str,
 arguments = parser.parse_args()
 foldername = arguments.foldername
 
-nvals = np.array([1000])
+nvals = np.array([100])
 # n = 20
-m = 8
+m = 4
 lower_q = 0.3
 upper_q = 0.7
 #etas = [0.02]
@@ -72,7 +72,7 @@ for N in nvals:
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
         dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,m,0}.csv")
         shape = dftrain.shape[0]
-        lam_vals[N] = [float(val[8:-4]) for val in dftrain['lam_list']]
+        lam_vals[N] = [val[0] for val in dftrain['lam_list']]
         mu_vals[N] = np.array(dftrain['mu'])
         values_st0 = []
         values_re0 = []
@@ -87,10 +87,10 @@ for N in nvals:
         for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
-            ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_train']),axis = 1)-0.0).argmin()
-            ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_train']),axis = 1)-0.0).argmin()
-            ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_train']),axis = 1)-(etas[i]-0.01)).argmin()
-            ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_train']),axis = 1)-(etas[i]-0.01)).argmin()
+            ind_s0 = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-0.0).argmin()
+            ind_r0 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-0.0).argmin()
+            ind_s = np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-(etas[i]-0.01)).argmin()
+            ind_r = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-(etas[i]-0.01)).argmin()
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Eps']),axis = 1)-1).argmin()
             values_st0.append(dfgrid['Test_val'][ind_s0])
             values_re0.append(dfgrid2['Test_val'][ind_r0])
@@ -135,26 +135,40 @@ for N in nvals:
         print(val_re[N],prob_re[N])
         print(val_re_nom[N],prob_re_nom[N])
 
+    dfgrid = pd.read_csv(foldername + f"results{16}/" + f"gridmv_{N,m,0}.csv")
+    mro_probs = dfgrid["Avg_prob_test"]
+    mro_vals = dfgrid["Test_val"]
+    for r in range(1,5):
+        dfgrid = pd.read_csv(foldername + f"results{16}/" + f"gridmv_{N,m,r}.csv")
+        mro_probs = np.vstack([mro_probs, dfgrid["Avg_prob_test"]])
+        mro_vals = np.vstack([mro_vals, dfgrid["Test_val"]])
+
     plt.figure(figsize = (6,3))
     plt.plot(prob_st[N], val_st[N], label = "Mean-Var set", color = "tab:blue")
     plt.plot(prob_re[N], val_re[N], label = "Reshaped set", color = "tab:orange")
     plt.fill_between(prob_st[N],val_st_lower[N],val_st_upper[N], color = "tab:blue", alpha=0.3)
     plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:orange", alpha=0.3)
+
+    plt.plot(np.mean(mro_probs,axis=0),np.mean(mro_vals, axis=0), label = "Wass DRO", color = "tab:green" )
+    plt.fill_between(np.mean(mro_probs,axis=0),np.quantile(mro_vals,lower_q, axis=0),np.quantile(mro_vals,upper_q, axis=0), color = "tab:green", alpha=0.3)
+
     # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
     # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
-    # plt.vlines(ymin=-455, ymax=-451, x=0.024, linestyles=":",
-    #        color="tab:red", label=r"$\hat{\eta}=0.024,0.06$") 
-    # plt.vlines(ymin=-455, ymax=-451, x=0.06, linestyles=":",
+    plt.vlines(ymin=-455, ymax=-451, x=0.024, linestyles=":",
+           color="tab:red", label=r"$\hat{\eta}=0.024,0.06$") 
+    plt.vlines(ymin=-455, ymax=-451, x=0.06, linestyles=":",
+           color="tab:red") 
+    plt.hlines(xmin=0.024, xmax=0.06, y=-452.88, linestyles="--",
+           color="black") 
+
+    
+    # plt.vlines(ymin=-465, ymax=-457, x=0.026, linestyles=":",
+    #        color="tab:red", label=r"$\hat{\eta}=0.026,0.054$") 
+    # plt.vlines(ymin=-465, ymax=-457, x=0.054, linestyles=":",
     #        color="tab:red") 
-    # plt.hlines(xmin=0.024, xmax=0.06, y=-452.88, linestyles="--",
+    # plt.hlines(xmin=0.026, xmax=0.054, y=-461.42, linestyles="--",
     #        color="black") 
     
-    plt.vlines(ymin=-465, ymax=-457, x=0.026, linestyles=":",
-           color="tab:red", label=r"$\hat{\eta}=0.026,0.054$") 
-    plt.vlines(ymin=-465, ymax=-457, x=0.054, linestyles=":",
-           color="tab:red") 
-    plt.hlines(xmin=0.026, xmax=0.054, y=-461.42, linestyles="--",
-           color="black") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
     plt.title(f"$m={m}$")
