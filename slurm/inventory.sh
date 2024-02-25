@@ -13,7 +13,7 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-# python inventory/inventory2.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/results17/ --eta 0.30
+# python inventory/inventory2.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/results18/ --eta 0.30
 
 python inventory/plot_avg.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/
 
