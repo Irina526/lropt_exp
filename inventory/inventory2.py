@@ -239,7 +239,7 @@ def trainloop(r1,foldername):
         # b_fin = result.b
 
         # Grid search epsilon
-        result4 = prob.grid(epslst = np.linspace(0.01, 1.5, 1), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
+        result4 = prob.grid(epslst = np.linspace(0.01, 1.5, 10), init_A = init, init_b = init_bval, seed = seed, init_alpha = 0., test_percentage =test_p,newdata = (newdata,new_y_data), eta=eta)
         dfgrid = result4.df
         prob.solve()
         # result5 = prob.grid(epslst = np.linspace(0.001,5, 20), init_A = A_fin, init_b = b_fin, seed = seed, init_alpha = 0., test_percentage = test_p,newdata = (newdata,new_y_data), eta=eta)
@@ -287,12 +287,11 @@ if __name__ == '__main__':
     h = np.random.uniform(0.1,0.3,n)
     njobs = get_n_processes(30)
     print(foldername)
-    t = trainloop(0,foldername)
-    # trainloop(1,foldername)
-    # trainloop(2,foldername)
-    # trainloop(3,foldername)
-    # trainloop(4,foldername)
-    print(t)
+    trainloop(5,foldername)
+    trainloop(6,foldername)
+    trainloop(7,foldername)
+    trainloop(8,foldername)
+    trainloop(9,foldername)
     
     # Parallel(n_jobs=1)(
     #     delayed(trainloop)(r, foldername) for r in range(R))

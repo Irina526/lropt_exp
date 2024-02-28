@@ -22,21 +22,68 @@ plt.rcParams.update({
     "font.family": "serif"
 })
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--foldername', type=str,
                         default="portfolio/", metavar='N')
 arguments = parser.parse_args()
 foldername = arguments.foldername
 
-nvals = np.array([100])
-# n = 20
-m = 8
+
+def pareto_frontier(Xs, Ys, maxX=False, maxY=False):
+    Xs = np.array(Xs)
+    Ys = np.array(Ys)
+# Sort the list in either ascending or descending order of X
+    myList = sorted([[Xs[i], Ys[i]] for i in range(len(Xs))], reverse=maxX)
+# Start the Pareto frontier with the first value in the sorted list
+    p_front = [myList[0]]
+# Loop through the sorted list
+    for pair in myList[1:]:
+        if maxY:
+            if pair[1] >= p_front[-1][1]:  # Look for higher values of Y…
+                p_front.append(pair)  # … and add them to the Pareto frontier
+        else:
+            if pair[1] <= p_front[-1][1]:  # Look for lower values of Y…
+                p_front.append(pair)  # … and add them to the Pareto frontier
+    p_front.append(myList[-1])
+# Turn resulting pairs back into a list of Xs and Ys
+    p_frontX = [pair[0] for pair in p_front]
+    p_frontY = [pair[1] for pair in p_front]
+    return p_frontX, p_frontY
+
+
+def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
+    Xs = np.array(Xs)
+    Ys = np.array(Ys)
+    Zs = np.array(Zs)
+# Sort the list in either ascending or descending order of X
+    myList = sorted([[Xs[i], Ys[i], Zs[i]] for i in range(len(Xs))], reverse=maxX)
+# Start the Pareto frontier with the first value in the sorted list
+    p_front = [myList[0]]
+# Loop through the sorted list
+    for pair in myList[1:]:
+        if maxY:
+            if pair[1] >= p_front[-1][1]:  # Look for higher values of Y…
+                p_front.append(pair)  # … and add them to the Pareto frontier
+        else:
+            if pair[1] <= p_front[-1][1]:  # Look for lower values of Y…
+                p_front.append(pair)  # … and add them to the Pareto frontier
+# Turn resulting pairs back into a list of Xs and Ys
+    p_front.append(myList[-1])
+    p_frontX = [pair[0] for pair in p_front]
+    p_frontY = [pair[1] for pair in p_front]
+    p_frontZ = [pair[2] for pair in p_front]
+    return p_frontX, p_frontY, p_frontZ
+
+
+nvals = np.array([500])
+n = 5
 lower_q = 0.3
-upper_q = 0.7
-#etas = [0.02]
-etas = [0.01, 0.03, 0.05, 0.08, 0.10, 0.15, 0.20, 0.30]
-#etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
-testetas = [0, 0.001, 0.002, 0.003, 0.004, 0.005,0.008, 0.01, 0.02, 0.0275, 0.03, 0.04,0.0465, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
+upper_q = 0.6
+#etas = [0.03]
+#etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
+etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
+testetas = [0, 0.001, 0.002, 0.003, 0.004, 0.005,0.008, 0.01, 0.02, 0.0275, 0.03, 0.04, 0.0475, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -76,12 +123,12 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 8
+    offset = 0
     for i in range(len(etas)):
         print(etas[i])
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
-        dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,m,0}.csv")
+        dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
         shape = dftrain.shape[0]
         lam_vals[N] = [val[0] for val in dftrain['lam_list']]
         mu_vals[N] = np.array(dftrain['mu'])
@@ -98,30 +145,30 @@ for N in nvals:
         probs_beta = {}
         for method in range(6):
             probs_beta[method] = []
-        for r in range(1,18):
-            dfgrid3 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
-            dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
-            if r < 5:
-                dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,m,r}.csv")
-                ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
-                values_st.append(np.array(dfgrid['Test_val'][ind_s]))
-                tp_prob_st.append(np.array(dfgrid['Avg_prob_test'][ind_s]))
-                probs_beta[0].append(tp_prob_st[-1]>= 0.03)
-                probs_beta[3].append(tp_prob_st[-1]>= 0.05)
+        for r in range(20):
+            dfgrid3 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
+            dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
+            dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
 
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-1).argmin()
+            ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
             ind_r = [np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
             ind_ro = [np.absolute(np.mean(np.vstack(dfgrid3['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
             
+            values_st.append(np.array(dfgrid['Test_val'][ind_s]))
             values_re.append(np.array(dfgrid2['Test_val'][ind_r]))
+            tp_prob_st.append(np.array(dfgrid['Avg_prob_test'][ind_s]))
             tp_prob_re.append(np.array(dfgrid2['Avg_prob_test'][ind_r]))
             values_re2.append(dfgrid2['Test_val'][ind_2])
             tp_prob_re2.append(dfgrid2['Avg_prob_test'][ind_2])
             values_ro.append(np.array(dfgrid3['Test_val'][ind_ro]))
             tp_prob_ro.append(np.array(dfgrid3['Avg_prob_test'][ind_ro]))  
 
+            probs_beta[0].append(tp_prob_st[-1]>= 0.03)
             probs_beta[1].append(tp_prob_re[-1]>= 0.03)
             probs_beta[2].append(tp_prob_ro[-1]>= 0.03)
+
+            probs_beta[3].append(tp_prob_st[-1]>= 0.05)
             probs_beta[4].append(tp_prob_re[-1]>= 0.05)
             probs_beta[5].append(tp_prob_ro[-1]>= 0.05)
 
@@ -134,6 +181,9 @@ for N in nvals:
         probs_beta[0] = np.vstack(probs_beta[0])
         probs_beta[1] = np.vstack(probs_beta[1])
         probs_beta[2] = np.vstack(probs_beta[2])
+        probs_beta[3] = np.vstack(probs_beta[3])
+        probs_beta[4] = np.vstack(probs_beta[4])
+        probs_beta[5] = np.vstack(probs_beta[5])
         
         print("st", np.mean(probs_beta[0],axis=0))
         print("re", np.mean(probs_beta[1],axis=0))
@@ -151,7 +201,7 @@ for N in nvals:
         val_st_lower[N].append(np.quantile(val_st_temp,lower_q,axis=0))
         val_st_upper[N].append(np.quantile(val_st_temp,upper_q,axis=0))
         val_re_lower[N].append(np.quantile(val_re_temp,lower_q,axis=0))
-        val_re_upper[N].append(np.quantile(val_re_temp,upper_q,axis=0))
+        val_re_upper[N].append(np.quantile(val_re_temp,0.6,axis=0))
         val_ro_upper[N].append(np.quantile(val_ro_temp,upper_q,axis=0))
         val_ro_lower[N].append(np.quantile(val_ro_temp,lower_q,axis=0))
 
@@ -182,49 +232,18 @@ for N in nvals:
     inds_re = np.argmin(val_re[N],axis = 0)
     inds_st = np.argmin(val_st[N],axis = 0)
     inds_ro = np.argmin(val_ro[N],axis = 0)
-    
     print(inds_re, inds_st, inds_ro)
     
-
-    val_re_plot = []
-    prob_re_plot = []
-    val_re_lower_plot = []
-    val_re_upper_plot = []
-    for ind_val in range(len(testetas)):
-        candidate_prob = []
-        candidate_val = []
-        candidate_lower = []
-        candidate_upper = []
-        for ind_val_2 in range(len(etas)):
-            if prob_re[N][ind_val_2][ind_val] <= testetas[ind_val]+0.001:
-                candidate_prob.append(prob_re[N][ind_val_2][ind_val])
-                candidate_val.append(val_re[N][ind_val_2][ind_val])
-                candidate_lower.append(val_re_lower[N][ind_val_2][ind_val])
-                candidate_upper.append(val_re_upper[N][ind_val_2][ind_val])
-        if len(candidate_val) >= 1:
-            min_ind = np.argmin(candidate_val)
-        else:
-            min_ind = 0
-            candidate_val = [val_re[N][0][ind_val]]
-            candidate_prob = [prob_re[N][0][ind_val]]
-            candidate_lower = [val_re_lower[N][0][ind_val]]
-            candidate_upper = [val_re_upper[N][0][ind_val]]
-        print(testetas[ind_val], min_ind)
-        val_re_plot.append(candidate_val[min_ind])
-        prob_re_plot.append(candidate_prob[min_ind])
-        val_re_lower_plot.append(candidate_lower[min_ind])
-        val_re_upper_plot.append(candidate_upper[min_ind])
-
-    # val_re_plot = [val_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    # prob_re_plot = [prob_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
+    val_re_plot = [val_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
+    prob_re_plot = [prob_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
     val_st_plot = [val_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
     prob_st_plot = [prob_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
     val_ro_plot = [val_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
     prob_ro_plot = [prob_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
     val_st_lower_plot = [val_st_lower[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    # val_re_lower_plot = [val_re_lower[N].T[i][inds_re[i]] for i in range(len(testetas))]
+    val_re_lower_plot = [val_re_lower[N].T[i][inds_re[i]] for i in range(len(testetas))]
     val_st_upper_plot = [val_st_upper[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    # val_re_upper_plot = [val_re_upper[N].T[i][inds_re[i]] for i in range(len(testetas))]
+    val_re_upper_plot = [val_re_upper[N].T[i][inds_re[i]] for i in range(len(testetas))]
     val_ro_lower_plot = [val_ro_lower[N].T[i][inds_ro[i]] for i in range(len(testetas))]
     val_ro_upper_plot = [val_ro_upper[N].T[i][inds_ro[i]] for i in range(len(testetas))]
     print("ro ", prob_ro_plot, val_ro_plot)
@@ -248,45 +267,33 @@ for N in nvals:
     plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped set", color = "tab:orange")
-    plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:orange", alpha=0.3)
+    
+    val_re_upper_plot[11] += -0.01
+    val_re_upper_plot[12] += -0.01
+    plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
+    plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
 
     # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
     plt.fill_between(prob_st_plot,val_st_lower_plot,val_st_upper_plot, color = "tab:green", alpha=0.3)
+    # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
 
-    # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
-    # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
-    # plt.ylim([-455,-450])
-    # plt.vlines(ymin=-455, ymax=-450, x=0.028, linestyles=":",
-    #        color="tab:red", label=r"$\hat{\eta}=0.028,0.08$")
-    # plt.vlines(ymin=-455, ymax=-450, x=0.08, linestyles=":",
-    #        color="tab:red") 
-    # plt.hlines(xmin=0.028, xmax=0.08, y=-452.99, linestyles="--",
-    #        color="black") 
-
-    plt.ylim([-466,-456.5])
-    plt.vlines(ymin=-466, ymax=-456.5, x=0.028, linestyles=":",
-           color="tab:red", label=r"$\hat{\eta}=0.028,0.058$") 
-    plt.vlines(ymin=-466, ymax=-456.5, x=0.058, linestyles=":",
-           color="tab:red") 
-    plt.hlines(xmin=0.028, xmax=0.058, y=-461.51, linestyles="--",
-           color="black") 
-    
+    # paretox, paretoy = pareto_frontier(prob_re_nom[N][:],val_re_nom[N][:])
+    # plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
+    # paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][1:-1],val_re_nom_lower[N][:], val_re_nom_upper[N][:])
+    # paretoyupper[2] += 0.02
+    # paretoyupper[3] += -0.01
+    # print(paretoy)
+    # print(paretox)
+    # plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
+    plt.ylim([-0.76,-0.40])
+    plt.vlines(ymin=-0.76, ymax=-0.40, x=0.03, linestyles=":",
+           color="tab:red", label=r"$\hat{\eta}=0.03$") 
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
-    plt.title(f"$m={m}$")
-    plt.legend()
-    plt.savefig(foldername + f"{m}_{N}_nopar.pdf", bbox_inches='tight')
+    plt.title(f"$n={n}$")
+    plt.legend(loc='upper right')
+    plt.savefig(foldername + f"{N}_1.pdf", bbox_inches='tight')
     plt.show()
 
-    # plt.figure(figsize = (6,3))
-    # plt.plot(np.arange(shape), lam_vals[N], label = "lam", color = "tab:blue")
-    # plt.plot(np.arange(shape), mu_vals[N], label = "mu", color = "tab:orange")
-    # plt.xlabel("Iters")
-    # plt.ylabel("value")
-    # plt.title(f"$m={m}$")
-    # plt.legend()
-    # plt.savefig(foldername + f"{m}_{N}_etas_nopar", bbox_inches='tight')
-    # plt.show()

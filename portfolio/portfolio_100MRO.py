@@ -247,7 +247,7 @@ def trainloop(r,foldername):
         # df = result.df
         # A_fin = result.A
         # b_fin = result.b
-        epslst=np.linspace(0.00001, 8, 100)
+        epslst=np.linspace(0.00001, 8, 1)
         # result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
         #                     init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         # dfgrid2 = result5.df
@@ -256,6 +256,8 @@ def trainloop(r,foldername):
                             init_alpha=0., test_percentage=test_p, newdata=(newdata,new_y_data), eta=eta)
         dfgrid = result4.df
 
+        prob.solve()
+        print(prob.solver_stats.solve_time)
         plot_coverage_all(dfgrid,None,None, foldername + f"port(N,m,r)_{N,n,r}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
         # plot_iters(df, result.df_test, foldername + f"port(N,m)_{N,n,r}", steps = 10000,logscale = 1)
@@ -276,7 +278,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 20
+    R = 1
     n = 5
     # eta = 0.4
     seed = 25

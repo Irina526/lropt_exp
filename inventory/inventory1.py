@@ -267,7 +267,7 @@ if __name__ == '__main__':
     eta = arguments.eta
     R = 5
     n = 10
-    m = 4
+    m = 8
     # eta = 0.4
     np.random.seed(27)
     y_nom = np.random.uniform(2,4,n)
@@ -285,11 +285,11 @@ if __name__ == '__main__':
     h = np.random.uniform(0.1,0.3,n)
     njobs = get_n_processes(30)
     print(foldername)
-    trainloop(0,foldername)
-    trainloop(1,foldername)
-    trainloop(2,foldername)
-    trainloop(3,foldername)
-    trainloop(4,foldername)
+    trainloop(5,foldername)
+    trainloop(6,foldername)
+    trainloop(7,foldername)
+    trainloop(8,foldername)
+    trainloop(9,foldername)
     # Parallel(n_jobs=1)(
     #     delayed(trainloop)(r, foldername) for r in range(R))
     # for r in range(R):
