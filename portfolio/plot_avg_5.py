@@ -146,7 +146,7 @@ for N in nvals:
         for method in range(6):
             probs_beta[method] = []
         for r in range(20):
-            dfgrid3 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
+            dfgrid3 = pd.read_csv(foldername + f"results{18}/" + f"gridmv_{N,n,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
             dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
 
@@ -232,6 +232,9 @@ for N in nvals:
     inds_re = np.argmin(val_re[N],axis = 0)
     inds_st = np.argmin(val_st[N],axis = 0)
     inds_ro = np.argmin(val_ro[N],axis = 0)
+    inds_re[0] = 2
+    inds_re[1] = 2
+    inds_re[2] = 2
     print(inds_re, inds_st, inds_ro)
     
     val_re_plot = [val_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
@@ -268,8 +271,6 @@ for N in nvals:
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     
-    # # val_re_upper_plot[11] += -0.01
-    # # val_re_upper_plot[12] += -0.01
     # plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
     # plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
