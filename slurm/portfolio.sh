@@ -15,7 +15,7 @@ conda activate lropt
 
 # python portfolio/portfolio_100.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old54/results7/ --eta 0.30
 
-python portfolio/plot_avg_5.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old53/
+python portfolio/plot_avg_10.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old52/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
