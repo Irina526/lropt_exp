@@ -79,7 +79,7 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 nvals = np.array([500])
 n = 5
 lower_q = 0.3
-upper_q = 0.75
+upper_q = 0.7
 #etas = [0.03]
 etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
 #etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
@@ -273,15 +273,15 @@ for N in nvals:
     # plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
     # plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
-
     paretox, paretoy = pareto_frontier(prob_re_plot[1:],val_re_plot[1:])
     plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_plot[1:],val_re_lower_plot[1:], val_re_upper_plot[1:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
-    plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
 
-    # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
     plt.fill_between(prob_st_plot,val_st_lower_plot,val_st_upper_plot, color = "tab:green", alpha=0.3)
+    plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
+    # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
+
     # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
 
     # paretox, paretoy = pareto_frontier(prob_re_nom[N][:],val_re_nom[N][:])
