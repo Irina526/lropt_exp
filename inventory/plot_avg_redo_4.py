@@ -30,7 +30,7 @@ foldername = arguments.foldername
 
 nvals = np.array([100])
 # n = 20
-m = 8
+m = 4
 lower_q = 0.3
 upper_q = 0.7
 #etas = [0.02]
@@ -76,7 +76,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 8
+    offset = 0
     for i in range(len(etas)):
         print(etas[i])
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
@@ -98,11 +98,11 @@ for N in nvals:
         probs_beta = {}
         for method in range(6):
             probs_beta[method] = []
-        for r in range(1,18):
+        for r in range(20):
             dfgrid3 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,m,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,m,r}.csv")
             if r < 20:
-                dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,m,r}.csv")
+                dfgrid = pd.read_csv(foldername + f"results{16}/" + f"gridmv_{N,m,r}.csv")
                 ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
                 values_st.append(np.array(dfgrid['Test_val'][ind_s]))
                 tp_prob_st.append(np.array(dfgrid['Avg_prob_test'][ind_s]))
@@ -258,21 +258,21 @@ for N in nvals:
 
     # plt.plot(prob_re_nom[N],val_re_nom[N],label="Reshaped_orig", color = "tab:green")
     # plt.fill_between(prob_re_nom[N],val_re_nom_lower[N],val_re_nom_upper[N], color = "tab:green", alpha=0.3)
-    # plt.ylim([-455,-450])
-    # plt.vlines(ymin=-455, ymax=-450, x=0.028, linestyles=":",
-    #        color="tab:red", label=r"$\hat{\eta}=0.028,0.08$")
-    # plt.vlines(ymin=-455, ymax=-450, x=0.08, linestyles=":",
-    #        color="tab:red") 
-    # plt.hlines(xmin=0.028, xmax=0.08, y=-452.99, linestyles="--",
-    #        color="black") 
-
-    plt.ylim([-466,-456.5])
-    plt.vlines(ymin=-466, ymax=-456.5, x=0.028, linestyles=":",
-           color="tab:red", label=r"$\hat{\eta}=0.028,0.064$") 
-    plt.vlines(ymin=-466, ymax=-456.5, x=0.064, linestyles=":",
+    plt.ylim([-455,-450])
+    plt.vlines(ymin=-455, ymax=-450, x=0.028, linestyles=":",
+           color="tab:red", label=r"$\hat{\eta}=0.028,0.12$")
+    plt.vlines(ymin=-455, ymax=-450, x=0.12, linestyles=":",
            color="tab:red") 
-    plt.hlines(xmin=0.028, xmax=0.064, y=-461.51, linestyles="--",
+    plt.hlines(xmin=0.028, xmax=0.12, y=-453.21, linestyles="--",
            color="black") 
+
+    # plt.ylim([-466,-456.5])
+    # plt.vlines(ymin=-466, ymax=-456.5, x=0.028, linestyles=":",
+    #        color="tab:red", label=r"$\hat{\eta}=0.028,0.068$") 
+    # plt.vlines(ymin=-466, ymax=-456.5, x=0.068, linestyles=":",
+    #        color="tab:red") 
+    # plt.hlines(xmin=0.028, xmax=0.068, y=-461.51, linestyles="--",
+    #        color="black") 
     
     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
     plt.ylabel("Objective value")
