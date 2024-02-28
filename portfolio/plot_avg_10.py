@@ -294,6 +294,12 @@ for N in nvals:
     plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
     plt.show()
 
+plt.rcParams.update({
+    "text.usetex":True,
+    
+    "font.size":20,
+    "font.family": "serif"
+})
 
 
 dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
