@@ -148,7 +148,7 @@ for N in nvals:
         for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
-            dfgrid3 = pd.read_csv(foldername + f"results{19}/" + f"gridmv_{N,n,r}.csv")
+            dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{N,n,r}.csv")
 
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-1).argmin()
             ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
@@ -305,7 +305,7 @@ plt.rcParams.update({
 dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
 
 dfgrid2 = pd.read_csv(foldername + f"results{7}/" + f"gridre_{500,n,0}.csv")
-dfgrid3 = pd.read_csv(foldername + f"results{19}/" + f"gridmv_{500,n,0}.csv")
+dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,0}.csv")
 
 dros = []
 ros = []
