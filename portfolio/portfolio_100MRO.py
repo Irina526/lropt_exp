@@ -190,7 +190,7 @@ def g_tch(t, x, y, u):
 
 def trainloop(r,foldername):
     seed = r + 10
-    for N in np.array([100]):
+    for N in np.array([500]):
         print(N,r)
         # seed += 1
         # s = 0
@@ -305,7 +305,7 @@ if __name__ == '__main__':
     val_re = []
     prob_st = []
     prob_re = []
-    nvals = np.array([100])
+    nvals = np.array([500])
     for N in nvals:
         dfgrid = pd.read_csv(foldername +f"gridmv_{N,n,0}.csv")
         dfgrid = dfgrid.drop(columns=["step","Probability_violations_test","var_values","Probability_violations_train"])
