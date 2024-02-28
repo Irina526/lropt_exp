@@ -241,7 +241,7 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
+        result = prob.train(lr=0.01, num_iter=100, optimizer="SGD",
                             seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
                             mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df

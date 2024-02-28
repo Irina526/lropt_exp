@@ -264,10 +264,10 @@ for N in nvals:
     
     plt.figure(figsize = (6,3))
 
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
+    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped set", color = "tab:orange")
+    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped DRO", color = "tab:orange")
     plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:orange", alpha=0.3)
 
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
@@ -361,7 +361,7 @@ for i in range(1, 11):
     plt.fill_between(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i-1], axis=1), 
                        np.sum(ros[12:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
-plt.title("Mean-Var set")
+plt.title("Mean-Var RO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Mean-var-dis.pdf", bbox_inches='tight')
@@ -375,7 +375,7 @@ for i in range(1, 11):
     plt.fill_between(np.array(dfgrid2["Avg_prob_test"]), np.sum(res[:, :i-1], axis=1), 
                        np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
-plt.title("Reshaped set")
+plt.title("Reshaped DRO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Reshaped-dis.pdf", bbox_inches='tight')

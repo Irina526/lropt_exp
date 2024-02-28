@@ -267,7 +267,7 @@ for N in nvals:
     
     plt.figure(figsize = (6,3))
 
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
+    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     
@@ -275,7 +275,7 @@ for N in nvals:
     # plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
     paretox, paretoy = pareto_frontier(prob_re_plot[1:],val_re_plot[1:])
-    plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
+    plt.plot(paretox, paretoy,label="Reshaped RO", color = "tab:orange")
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_plot[1:],val_re_lower_plot[1:], val_re_upper_plot[1:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
 

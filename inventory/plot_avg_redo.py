@@ -209,7 +209,7 @@ for N in nvals:
             candidate_prob = [prob_re[N][0][ind_val]]
             candidate_lower = [val_re_lower[N][0][ind_val]]
             candidate_upper = [val_re_upper[N][0][ind_val]]
-        print(testetas[ind_val], min_ind)
+        print(ind_val, testetas[ind_val], min_ind)
         val_re_plot.append(candidate_val[min_ind])
         prob_re_plot.append(candidate_prob[min_ind])
         val_re_lower_plot.append(candidate_lower[min_ind])
@@ -245,10 +245,10 @@ for N in nvals:
     
     plt.figure(figsize = (6,3))
 
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
+    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped set", color = "tab:orange")
+    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped RO", color = "tab:orange")
     plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:orange", alpha=0.3)
 
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
