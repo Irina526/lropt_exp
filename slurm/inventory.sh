@@ -15,7 +15,7 @@ conda activate lropt
 
 # python inventory/inventory1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/results17/ --eta 0.30
 
-python inventory/plot_avg_redo.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/
+python inventory/plot_avg_redo_4.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 

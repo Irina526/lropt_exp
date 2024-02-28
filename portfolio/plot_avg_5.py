@@ -79,10 +79,10 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 nvals = np.array([500])
 n = 5
 lower_q = 0.3
-upper_q = 0.6
+upper_q = 0.75
 #etas = [0.03]
-#etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
+etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
+#etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 testetas = [0, 0.001, 0.002, 0.003, 0.004, 0.005,0.008, 0.01, 0.02, 0.0275, 0.03, 0.04, 0.0475, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 val_st = {}
 val_re = {}
@@ -123,7 +123,7 @@ for N in nvals:
     prob_re_nom[N] = []
     # for i in range(len(etas)):
     # first = 0
-    offset = 0
+    offset = 8
     for i in range(len(etas)):
         print(etas[i])
         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
@@ -201,7 +201,7 @@ for N in nvals:
         val_st_lower[N].append(np.quantile(val_st_temp,lower_q,axis=0))
         val_st_upper[N].append(np.quantile(val_st_temp,upper_q,axis=0))
         val_re_lower[N].append(np.quantile(val_re_temp,lower_q,axis=0))
-        val_re_upper[N].append(np.quantile(val_re_temp,0.6,axis=0))
+        val_re_upper[N].append(np.quantile(val_re_temp,upper_q,axis=0))
         val_ro_upper[N].append(np.quantile(val_ro_temp,upper_q,axis=0))
         val_ro_lower[N].append(np.quantile(val_ro_temp,lower_q,axis=0))
 
@@ -268,11 +268,16 @@ for N in nvals:
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     
-    val_re_upper_plot[11] += -0.01
-    val_re_upper_plot[12] += -0.01
-    plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
-    plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
+    # # val_re_upper_plot[11] += -0.01
+    # # val_re_upper_plot[12] += -0.01
+    # plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
+    # plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
+
+    paretox, paretoy = pareto_frontier(prob_re_plot[1:],val_re_plot[1:])
+    plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
+    paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_plot[1:],val_re_lower_plot[1:], val_re_upper_plot[1:])
+    plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
 
     # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")

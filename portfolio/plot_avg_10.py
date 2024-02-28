@@ -102,195 +102,277 @@ val_re_nom = {}
 prob_re_nom = {}
 mu_vals = {}
 lam_vals = {}
-for N in nvals:
-    mu_vals[N] = []
-    lam_vals[N] = []
-    val_st[N] = []
-    val_re[N] = []
-    prob_st[N] = []
-    prob_re[N] = []
-    val_st_lower[N] = []
-    val_re_lower[N] = []
-    val_ro[N] = []
-    prob_ro[N] = []
-    val_ro_lower[N] = []
-    val_ro_upper[N] = []
-    val_st_upper[N] = []
-    val_re_upper[N] = []
-    val_re_nom[N] = []
-    val_re_nom_upper[N] = []
-    val_re_nom_lower[N] = []
-    prob_re_nom[N] = []
-    # for i in range(len(etas)):
-    # first = 0
-    offset = 0
-    for i in range(len(etas)):
-        print(etas[i])
-        # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
-        # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
-        dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
-        shape = dftrain.shape[0]
-        lam_vals[N] = [val[0] for val in dftrain['lam_list']]
-        mu_vals[N] = np.array(dftrain['mu'])
-        values_st = []
-        values_re = []
-        values_re2 = []
-        tp_prob_st = []
-        tp_prob_re = []
-        tp_prob_st0 = []
-        tp_prob_re0 = []
-        tp_prob_re2 = []
-        values_ro = []
-        tp_prob_ro = []
-        probs_beta = {}
-        for method in range(6):
-            probs_beta[method] = []
-        for r in range(20):
-            dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
-            dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
-            dfgrid3 = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
+# for N in nvals:
+#     mu_vals[N] = []
+#     lam_vals[N] = []
+#     val_st[N] = []
+#     val_re[N] = []
+#     prob_st[N] = []
+#     prob_re[N] = []
+#     val_st_lower[N] = []
+#     val_re_lower[N] = []
+#     val_ro[N] = []
+#     prob_ro[N] = []
+#     val_ro_lower[N] = []
+#     val_ro_upper[N] = []
+#     val_st_upper[N] = []
+#     val_re_upper[N] = []
+#     val_re_nom[N] = []
+#     val_re_nom_upper[N] = []
+#     val_re_nom_lower[N] = []
+#     prob_re_nom[N] = []
+#     # for i in range(len(etas)):
+#     # first = 0
+#     offset = 0
+#     for i in range(len(etas)):
+#         print(etas[i])
+#         # dfgrid = pd.read_csv(foldername + f"results{i + offset}/" + f"results/gridmv_{N,m}.csv")
+#         # dfgrid2= pd.read_csv(foldername + f"results{i+ offset}/" + f"results/gridre_{N,m}.csv")
+#         dftrain = pd.read_csv(foldername + f"results{i+offset}/" + f"train_{N,n,0}.csv")
+#         shape = dftrain.shape[0]
+#         lam_vals[N] = [val[0] for val in dftrain['lam_list']]
+#         mu_vals[N] = np.array(dftrain['mu'])
+#         values_st = []
+#         values_re = []
+#         values_re2 = []
+#         tp_prob_st = []
+#         tp_prob_re = []
+#         tp_prob_st0 = []
+#         tp_prob_re0 = []
+#         tp_prob_re2 = []
+#         values_ro = []
+#         tp_prob_ro = []
+#         probs_beta = {}
+#         for method in range(6):
+#             probs_beta[method] = []
+#         for r in range(20):
+#             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
+#             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
+#             dfgrid3 = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
 
-            ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-1).argmin()
-            ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
-            ind_r = [np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
-            ind_ro = [np.absolute(np.mean(np.vstack(dfgrid3['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
+#             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-1).argmin()
+#             ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
+#             ind_r = [np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
+#             ind_ro = [np.absolute(np.mean(np.vstack(dfgrid3['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
             
-            values_st.append(np.array(dfgrid['Test_val'][ind_s]))
-            values_re.append(np.array(dfgrid2['Test_val'][ind_r]))
-            tp_prob_st.append(np.array(dfgrid['Avg_prob_test'][ind_s]))
-            tp_prob_re.append(np.array(dfgrid2['Avg_prob_test'][ind_r]))
-            values_re2.append(dfgrid2['Test_val'][ind_2])
-            tp_prob_re2.append(dfgrid2['Avg_prob_test'][ind_2])
-            values_ro.append(np.array(dfgrid3['Test_val'][ind_ro]))
-            tp_prob_ro.append(np.array(dfgrid3['Avg_prob_test'][ind_ro]))  
+#             values_st.append(np.array(dfgrid['Test_val'][ind_s]))
+#             values_re.append(np.array(dfgrid2['Test_val'][ind_r]))
+#             tp_prob_st.append(np.array(dfgrid['Avg_prob_test'][ind_s]))
+#             tp_prob_re.append(np.array(dfgrid2['Avg_prob_test'][ind_r]))
+#             values_re2.append(dfgrid2['Test_val'][ind_2])
+#             tp_prob_re2.append(dfgrid2['Avg_prob_test'][ind_2])
+#             values_ro.append(np.array(dfgrid3['Test_val'][ind_ro]))
+#             tp_prob_ro.append(np.array(dfgrid3['Avg_prob_test'][ind_ro]))  
 
-            probs_beta[0].append(tp_prob_st[-1]>= 0.03)
-            probs_beta[1].append(tp_prob_re[-1]>= 0.03)
-            probs_beta[2].append(tp_prob_ro[-1]>= 0.03)
+#             probs_beta[0].append(tp_prob_st[-1]>= 0.03)
+#             probs_beta[1].append(tp_prob_re[-1]>= 0.03)
+#             probs_beta[2].append(tp_prob_ro[-1]>= 0.03)
 
-            probs_beta[3].append(tp_prob_st[-1]>= 0.05)
-            probs_beta[4].append(tp_prob_re[-1]>= 0.05)
-            probs_beta[5].append(tp_prob_ro[-1]>= 0.05)
+#             probs_beta[3].append(tp_prob_st[-1]>= 0.05)
+#             probs_beta[4].append(tp_prob_re[-1]>= 0.05)
+#             probs_beta[5].append(tp_prob_ro[-1]>= 0.05)
 
-        val_st_temp = np.vstack(values_st)
-        val_re_temp = np.vstack(values_re)
-        prob_st_temp = np.vstack(tp_prob_st)
-        prob_re_temp = np.vstack(tp_prob_re)
-        val_ro_temp = np.vstack(values_ro)
-        prob_ro_temp = np.vstack(tp_prob_ro)
-        probs_beta[0] = np.vstack(probs_beta[0])
-        probs_beta[1] = np.vstack(probs_beta[1])
-        probs_beta[2] = np.vstack(probs_beta[2])
-        probs_beta[3] = np.vstack(probs_beta[3])
-        probs_beta[4] = np.vstack(probs_beta[4])
-        probs_beta[5] = np.vstack(probs_beta[5])
+#         val_st_temp = np.vstack(values_st)
+#         val_re_temp = np.vstack(values_re)
+#         prob_st_temp = np.vstack(tp_prob_st)
+#         prob_re_temp = np.vstack(tp_prob_re)
+#         val_ro_temp = np.vstack(values_ro)
+#         prob_ro_temp = np.vstack(tp_prob_ro)
+#         probs_beta[0] = np.vstack(probs_beta[0])
+#         probs_beta[1] = np.vstack(probs_beta[1])
+#         probs_beta[2] = np.vstack(probs_beta[2])
+#         probs_beta[3] = np.vstack(probs_beta[3])
+#         probs_beta[4] = np.vstack(probs_beta[4])
+#         probs_beta[5] = np.vstack(probs_beta[5])
         
-        print("st", np.mean(probs_beta[0],axis=0))
-        print("re", np.mean(probs_beta[1],axis=0))
-        print("ro", np.mean(probs_beta[2],axis=0))
-        print("st1", np.mean(probs_beta[3],axis=0))
-        print("re1", np.mean(probs_beta[4],axis=0))
-        print("ro1", np.mean(probs_beta[5],axis=0))
+#         print("st", np.mean(probs_beta[0],axis=0))
+#         print("re", np.mean(probs_beta[1],axis=0))
+#         print("ro", np.mean(probs_beta[2],axis=0))
+#         print("st1", np.mean(probs_beta[3],axis=0))
+#         print("re1", np.mean(probs_beta[4],axis=0))
+#         print("ro1", np.mean(probs_beta[5],axis=0))
 
-        val_ro[N].append(np.mean(val_ro_temp,axis=0))
-        prob_ro[N].append(np.mean(prob_ro_temp,axis=0))
-        val_re[N].append(np.mean(val_re_temp,axis=0))
-        val_st[N].append(np.mean(val_st_temp,axis=0))
-        prob_re[N].append(np.mean(tp_prob_re,axis=0))
-        prob_st[N].append(np.mean(tp_prob_st,axis=0))
-        val_st_lower[N].append(np.quantile(val_st_temp,lower_q,axis=0))
-        val_st_upper[N].append(np.quantile(val_st_temp,upper_q,axis=0))
-        val_re_lower[N].append(np.quantile(val_re_temp,lower_q,axis=0))
-        val_re_upper[N].append(np.quantile(val_re_temp,0.6,axis=0))
-        val_ro_upper[N].append(np.quantile(val_ro_temp,upper_q,axis=0))
-        val_ro_lower[N].append(np.quantile(val_ro_temp,lower_q,axis=0))
+#         val_ro[N].append(np.mean(val_ro_temp,axis=0))
+#         prob_ro[N].append(np.mean(prob_ro_temp,axis=0))
+#         val_re[N].append(np.mean(val_re_temp,axis=0))
+#         val_st[N].append(np.mean(val_st_temp,axis=0))
+#         prob_re[N].append(np.mean(tp_prob_re,axis=0))
+#         prob_st[N].append(np.mean(tp_prob_st,axis=0))
+#         val_st_lower[N].append(np.quantile(val_st_temp,lower_q,axis=0))
+#         val_st_upper[N].append(np.quantile(val_st_temp,upper_q,axis=0))
+#         val_re_lower[N].append(np.quantile(val_re_temp,lower_q,axis=0))
+#         val_re_upper[N].append(np.quantile(val_re_temp,0.6,axis=0))
+#         val_ro_upper[N].append(np.quantile(val_ro_temp,upper_q,axis=0))
+#         val_ro_lower[N].append(np.quantile(val_ro_temp,lower_q,axis=0))
 
-        val_re_nom_upper[N].append(np.quantile(values_re2,upper_q))
-        val_re_nom_lower[N].append(np.quantile(values_re2,lower_q))
-        val_re_nom[N].append(np.mean(values_re2))
-        prob_re_nom[N].append(np.mean(tp_prob_re2))
+#         val_re_nom_upper[N].append(np.quantile(values_re2,upper_q))
+#         val_re_nom_lower[N].append(np.quantile(values_re2,lower_q))
+#         val_re_nom[N].append(np.mean(values_re2))
+#         prob_re_nom[N].append(np.mean(tp_prob_re2))
 
-        # print(np.mean(np.array(tp_prob_st) >= 0.03))
-        # print(np.mean(np.array(tp_prob_re) >= 0.03))
-        # print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
-        # print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
-        # print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
+#         # print(np.mean(np.array(tp_prob_st) >= 0.03))
+#         # print(np.mean(np.array(tp_prob_re) >= 0.03))
+#         # print(val_st_lower[N], val_st_upper[N],val_st[N],prob_st[N])
+#         # print(val_re_lower[N], val_re_upper[N],val_re[N],prob_re[N])
+#         # print(val_re_nom_upper[N],val_re_nom_lower[N],val_re_nom[N],prob_re_nom[N])
 
-    val_re[N] = np.vstack(val_re[N])
-    val_re_lower[N] = np.vstack(val_re_lower[N])
-    val_re_upper[N] = np.vstack(val_re_upper[N])
-    val_st_lower[N] = np.vstack(val_st_lower[N])
-    val_st_upper[N] = np.vstack(val_st_upper[N])
+#     val_re[N] = np.vstack(val_re[N])
+#     val_re_lower[N] = np.vstack(val_re_lower[N])
+#     val_re_upper[N] = np.vstack(val_re_upper[N])
+#     val_st_lower[N] = np.vstack(val_st_lower[N])
+#     val_st_upper[N] = np.vstack(val_st_upper[N])
 
-    val_ro[N] = np.vstack(val_ro[N])
-    val_ro_lower[N] = np.vstack(val_ro_lower[N])
-    val_ro_upper[N] = np.vstack(val_ro_upper[N])
-    prob_ro[N] = np.vstack(prob_ro[N])
-    prob_re[N] = np.vstack(prob_re[N])
-    val_st[N] = np.vstack(val_st[N])
-    prob_st[N] = np.vstack(prob_st[N])
-    inds_re = np.argmin(val_re[N],axis = 0)
-    inds_st = np.argmin(val_st[N],axis = 0)
-    inds_ro = np.argmin(val_ro[N],axis = 0)
-    print(inds_re, inds_st, inds_ro)
+#     val_ro[N] = np.vstack(val_ro[N])
+#     val_ro_lower[N] = np.vstack(val_ro_lower[N])
+#     val_ro_upper[N] = np.vstack(val_ro_upper[N])
+#     prob_ro[N] = np.vstack(prob_ro[N])
+#     prob_re[N] = np.vstack(prob_re[N])
+#     val_st[N] = np.vstack(val_st[N])
+#     prob_st[N] = np.vstack(prob_st[N])
+#     inds_re = np.argmin(val_re[N],axis = 0)
+#     inds_st = np.argmin(val_st[N],axis = 0)
+#     inds_ro = np.argmin(val_ro[N],axis = 0)
+#     print(inds_re, inds_st, inds_ro)
     
-    val_re_plot = [val_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    prob_re_plot = [prob_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    val_st_plot = [val_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    prob_st_plot = [prob_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    val_ro_plot = [val_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    prob_ro_plot = [prob_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    val_st_lower_plot = [val_st_lower[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    val_re_lower_plot = [val_re_lower[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    val_st_upper_plot = [val_st_upper[N].T[i][inds_st[i]] for i in range(len(testetas))]
-    val_re_upper_plot = [val_re_upper[N].T[i][inds_re[i]] for i in range(len(testetas))]
-    val_ro_lower_plot = [val_ro_lower[N].T[i][inds_ro[i]] for i in range(len(testetas))]
-    val_ro_upper_plot = [val_ro_upper[N].T[i][inds_ro[i]] for i in range(len(testetas))]
-    print("ro ", prob_ro_plot, val_ro_plot)
-    print("nom ", prob_re_nom[N],val_re_nom[N])
-    print("dro ", prob_st_plot, val_st_plot)
-    print("Re ", prob_re_plot, val_re_plot)
+#     val_re_plot = [val_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     prob_re_plot = [prob_re[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     val_st_plot = [val_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
+#     prob_st_plot = [prob_st[N].T[i][inds_st[i]] for i in range(len(testetas))]
+#     val_ro_plot = [val_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     prob_ro_plot = [prob_ro[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     val_st_lower_plot = [val_st_lower[N].T[i][inds_st[i]] for i in range(len(testetas))]
+#     val_re_lower_plot = [val_re_lower[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     val_st_upper_plot = [val_st_upper[N].T[i][inds_st[i]] for i in range(len(testetas))]
+#     val_re_upper_plot = [val_re_upper[N].T[i][inds_re[i]] for i in range(len(testetas))]
+#     val_ro_lower_plot = [val_ro_lower[N].T[i][inds_ro[i]] for i in range(len(testetas))]
+#     val_ro_upper_plot = [val_ro_upper[N].T[i][inds_ro[i]] for i in range(len(testetas))]
+#     print("ro ", prob_ro_plot, val_ro_plot)
+#     print("nom ", prob_re_nom[N],val_re_nom[N])
+#     print("dro ", prob_st_plot, val_st_plot)
+#     print("Re ", prob_re_plot, val_re_plot)
 
-    # print(prob_re_nom[N],val_re_nom[N])
-    # print(prob_st[N])
+#     # print(prob_re_nom[N],val_re_nom[N])
+#     # print(prob_st[N])
 
-    # dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,0}.csv")
-    # ro_probs = dfgrid["Avg_prob_test"]
-    # ro_vals = dfgrid["Test_val"]
-    # for r in range(1,20):
-    #     dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
-    #     ro_probs = np.vstack([ro_probs, dfgrid["Avg_prob_test"]])
-    #     ro_vals = np.vstack([ro_vals, dfgrid["Test_val"]])
+#     # dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,0}.csv")
+#     # ro_probs = dfgrid["Avg_prob_test"]
+#     # ro_vals = dfgrid["Test_val"]
+#     # for r in range(1,20):
+#     #     dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
+#     #     ro_probs = np.vstack([ro_probs, dfgrid["Avg_prob_test"]])
+#     #     ro_vals = np.vstack([ro_vals, dfgrid["Test_val"]])
     
-    plt.figure(figsize = (6,3))
+#     plt.figure(figsize = (6,3))
 
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
-    plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
+#     plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var set", color = "tab:blue" )
+#     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped set", color = "tab:orange")
-    plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:orange", alpha=0.3)
+#     plt.plot(prob_re_plot, val_re_plot, label = "Reshaped set", color = "tab:orange")
+#     plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:orange", alpha=0.3)
 
-    plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
+#     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
 
-    # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
-    plt.fill_between(prob_st_plot,val_st_lower_plot,val_st_upper_plot, color = "tab:green", alpha=0.3)
-    # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
+#     # plt.plot(prob_re[N], val_re[N], label = "Reshaped", color = "tab:green")
+#     plt.fill_between(prob_st_plot,val_st_lower_plot,val_st_upper_plot, color = "tab:green", alpha=0.3)
+#     # plt.fill_between(prob_re[N],val_re_lower[N],val_re_upper[N], color = "tab:green", alpha=0.3)
 
-    # paretox, paretoy = pareto_frontier(prob_re_nom[N][:],val_re_nom[N][:])
-    # plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
-    # paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][1:-1],val_re_nom_lower[N][:], val_re_nom_upper[N][:])
-    # paretoyupper[2] += 0.02
-    # paretoyupper[3] += -0.01
-    # print(paretoy)
-    # print(paretox)
-    # plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
-    plt.ylim([-0.86,-0.63])
-    plt.vlines(ymin=-0.86, ymax=-0.63, x=0.03, linestyles=":",
-           color="tab:red", label=r"$\hat{\eta}=0.03$") 
-    plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
-    plt.ylabel("Objective value")
-    plt.title(f"$n={n}$")
-    plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
-    plt.show()
+#     # paretox, paretoy = pareto_frontier(prob_re_nom[N][:],val_re_nom[N][:])
+#     # plt.plot(paretox, paretoy,label="Reshaped set", color = "tab:orange")
+#     # paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_nom[N][1:-1],val_re_nom_lower[N][:], val_re_nom_upper[N][:])
+#     # paretoyupper[2] += 0.02
+#     # paretoyupper[3] += -0.01
+#     # print(paretoy)
+#     # print(paretox)
+#     # plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
+#     plt.ylim([-0.86,-0.63])
+#     plt.vlines(ymin=-0.86, ymax=-0.63, x=0.03, linestyles=":",
+#            color="tab:red", label=r"$\hat{\eta}=0.03$") 
+#     plt.xlabel(r"Prob. of constraint violation $(\hat{\eta})$")
+#     plt.ylabel("Objective value")
+#     plt.title(f"$n={n}$")
+#     plt.legend(loc='upper right')
+#     plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
+#     plt.show()
+
+
+
+dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
+
+dfgrid2 = pd.read_csv(foldername + f"results{7}/" + f"gridre_{500,n,0}.csv")
+dfgrid3 = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{500,n,0}.csv")
+
+dros = []
+ros = []
+res = []
+print(np.array(dfgrid["Avg_prob_test"]))
+print(np.array(dfgrid3["Avg_prob_test"]))
+print(np.array(dfgrid2["Avg_prob_test"]))
+
+for i in range(100):
+    dro= np.array(dfgrid["var_values"])[i][11:-22]
+    dro = dro[dro.index("[")+1:]
+    dro = dro[:dro.index("]")]
+    dro = dro.replace(" ","")
+    dro = dro.replace("\n", "")
+    dro = dro.split(",")
+    ro = np.array(dfgrid3["var_values"])[i][11:-22]
+    ro = ro[ro.index("[")+1:]
+    ro = ro[:ro.index("]")]    
+    ro = ro.replace(" ","")
+    ro = ro.replace("\n", "")
+    ro = ro.split(",")
+    re = np.array(dfgrid2["var_values"])[i][11:-22]
+    re = re[re.index("[")+1:]
+    re = re[:re.index("]")]
+    re = re.replace("\n", "")
+    re = re.replace(" ","")
+    re = re.split(",")
+    
+    # print(i, dro,ro,re)
+    ros.append(np.array([float(j) for j in ro]))
+    res.append(np.array([float(j) for j in re]))
+    dros.append(np.array([float(j) for j in dro]))
+
+plt.figure(figsize = (5,4))
+dros = np.vstack(dros)
+for i in range(1, 11):
+    plt.plot(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i], axis=1),
+               color='black', linewidth=1.0)
+    plt.fill_between(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i-1], axis=1), 
+                       np.sum(dros[10:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+# plt.xlim([-0.03,0.33])
+plt.title("Wass DRO")
+plt.xlabel(r"$\hat{\eta}$")
+plt.ylabel("Portfolio weights")
+plt.savefig(foldername + "Wass-dis.pdf", bbox_inches='tight')
+plt.show()
+
+plt.figure(figsize = (5,4))
+ros = np.vstack(ros)
+for i in range(1, 11):
+    plt.plot(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i], axis=1),
+               color='black', linewidth=1.0)
+    plt.fill_between(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i-1], axis=1), 
+                       np.sum(ros[12:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+# plt.xlim([-0.03,0.33])
+plt.title("Mean-Var set")
+plt.xlabel(r"$\hat{\eta}$")
+plt.ylabel("Portfolio weights")
+plt.savefig(foldername + "Mean-var-dis.pdf", bbox_inches='tight')
+plt.show()
+
+plt.figure(figsize = (5,4))
+res = np.vstack(res)
+for i in range(1, 11):
+    plt.plot(np.array(dfgrid2["Avg_prob_test"]), np.sum(res[:, :i], axis=1),
+               color='black', linewidth=1.0)
+    plt.fill_between(np.array(dfgrid2["Avg_prob_test"]), np.sum(res[:, :i-1], axis=1), 
+                       np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+# plt.xlim([-0.03,0.33])
+plt.title("Reshaped set")
+plt.xlabel(r"$\hat{\eta}$")
+plt.ylabel("Portfolio weights")
+plt.savefig(foldername + "Reshaped-dis.pdf", bbox_inches='tight')
+plt.show()
+
 

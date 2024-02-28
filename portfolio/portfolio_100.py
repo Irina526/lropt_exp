@@ -203,7 +203,7 @@ def trainloop(r,foldername):
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
                 # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
-                init = sc.linalg.sqrtm(np.cov(train.T))
+                init = sc.linalg.sqrtm(np.cov(train.T)+0.001*np.eye(n))
             except Exception as e:
                 seed += 1
             else: 
@@ -242,7 +242,7 @@ def trainloop(r,foldername):
         #iters = 5000
         # Train A and b
         result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
-                            seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
+                            seed=s, init_A=0.5*init, init_b=init_bval, init_lam=1, init_mu=1,
                             mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
