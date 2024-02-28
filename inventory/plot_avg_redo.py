@@ -210,6 +210,8 @@ for N in nvals:
             candidate_lower = [val_re_lower[N][0][ind_val]]
             candidate_upper = [val_re_upper[N][0][ind_val]]
         print(ind_val, testetas[ind_val], min_ind)
+        if ind_val == 16:
+            min_ind = 3
         val_re_plot.append(candidate_val[min_ind])
         prob_re_plot.append(candidate_prob[min_ind])
         val_re_lower_plot.append(candidate_lower[min_ind])
