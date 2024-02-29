@@ -186,11 +186,11 @@ def f_tch(t, x, y, u):
 def g_tch(t, x, y, u):
     # x,y,u are tensors that represent the cp.Variable x and cp.Parameter y and u.
     # The cp.Constant c is converted to a tensor
-    return -x @ u - t
+    return -x @ u.T - t
 
 
 def trainloop(r,foldername):
-    seed = r + 10
+    seed = r
     for N in np.array([500]):
         print(N,r)
         # seed += 1
@@ -203,7 +203,7 @@ def trainloop(r,foldername):
                 train, test = train_test_split(data, test_size=int(
                   data.shape[0]*test_p), random_state=seed)
                 # init = np.real(sc.linalg.sqrtm(sc.linalg.inv(np.diag(np.ones(n)*0.005)+ np.cov(train.T))))
-                init = sc.linalg.sqrtm(np.cov(train.T)+0.001*np.eye(n))
+                init = sc.linalg.sqrtm(np.cov(train.T)+0.01*np.eye(n))
             except Exception as e:
                 seed += 1
             else: 
@@ -241,14 +241,14 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.01, num_iter=3000, optimizer="SGD",
-                            seed=s, init_A=0.5*init, init_b=init_bval, init_lam=1, init_mu=1,
+        result = prob.train(lr=0.0001, num_iter=100, optimizer="SGD",
+                            seed=s, init_A=init, init_b=init_bval, init_lam=1, init_mu=1,
                             mu_multiplier=1.005, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 300, lr_gamma = 0.2, position = False, random_init = True, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
-        epslst=np.linspace(0.00001, 10, 200)
-        result5 = prob.grid(epslst=epslst, init_A=result.eps*A_fin, init_b=b_fin, seed=s,
+        epslst=np.linspace(0.00001, 5, 100)
+        result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
         result4 = prob.grid(epslst=epslst, init_A=init,
@@ -277,15 +277,15 @@ if __name__ == '__main__':
     foldername = arguments.foldername
     eta = arguments.eta
     R = 20
-    n = 5
+    n = 10
     # eta = 0.4
     seed = 25
-    np.random.seed(seed)
     sig, mu = gen_sigmu(n,1)
+    np.random.seed(seed)
     # dist = (np.array([25, 10, 60, 50, 40, 30, 30, 20,
     #                 20, 15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5])/10)[:n]
-    dist = mu
     # y_data = np.random.dirichlet(dist, 10)
+    dist = mu
     y_nom = np.random.dirichlet(dist)
     njobs = get_n_processes(30)
     print(foldername)

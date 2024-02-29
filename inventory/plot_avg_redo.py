@@ -36,7 +36,7 @@ upper_q = 0.7
 #etas = [0.02]
 etas = [0.01, 0.03, 0.05, 0.08, 0.10, 0.15, 0.20, 0.30]
 #etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
-testetas = [0, 0.001, 0.002, 0.003, 0.004, 0.005,0.008, 0.01, 0.02, 0.0275, 0.03, 0.04,0.0465, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
+testetas = [0, 0.001, 0.002, 0.003, 0.004, 0.005,0.008, 0.01, 0.02, 0.0275, 0.03, 0.04,0.0465, 0.05, 0.06, 0.066, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
 val_st = {}
 val_re = {}
 val_st_lower = {}
@@ -210,8 +210,6 @@ for N in nvals:
             candidate_lower = [val_re_lower[N][0][ind_val]]
             candidate_upper = [val_re_upper[N][0][ind_val]]
         print(ind_val, testetas[ind_val], min_ind)
-        if ind_val == 16:
-            min_ind = 3
         val_re_plot.append(candidate_val[min_ind])
         prob_re_plot.append(candidate_prob[min_ind])
         val_re_lower_plot.append(candidate_lower[min_ind])
