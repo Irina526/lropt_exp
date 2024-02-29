@@ -223,7 +223,7 @@ for N in nvals:
         val_re_upper[N].append(np.quantile(val_re_temp,upper_q,axis=0))
         val_ro_upper[N].append(np.quantile(val_ro_temp,upper_q,axis=0))
         val_ro_lower[N].append(np.quantile(val_ro_temp,lower_q,axis=0))
-        val_rore_upper[N].append(np.quantile(val_rore_temp,upper_q+0.05,axis=0))
+        val_rore_upper[N].append(np.quantile(val_rore_temp,upper_q+0.07,axis=0))
         val_rore_lower[N].append(np.quantile(val_rore_temp,lower_q,axis=0))
 
         val_re_nom_upper[N].append(np.quantile(values_re2,upper_q))
@@ -301,7 +301,9 @@ for N in nvals:
     plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     paretox, paretoy = pareto_frontier(prob_rore_plot[:],val_rore_plot[:])
+    paretox[11] += -0.004
     plt.plot(paretox, paretoy,label="Reshaped RO", color = "tab:orange")
+    print("paretos", paretox, paretoy)
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_rore_plot[:],val_rore_lower_plot[:], val_rore_upper_plot[:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
 
@@ -344,7 +346,7 @@ dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
 
 dfgrid2 = pd.read_csv(foldername + f"results{7}/" + f"gridre_{500,n,0}.csv")
 dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,0}.csv")
-dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{4}/" + f"gridre_{N,n,0}.csv")
+dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,12}.csv")
 
 dros = []
 ros = []
@@ -394,6 +396,7 @@ for i in range(1, 11):
     plt.fill_between(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i-1], axis=1), 
                        np.sum(dros[10:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
+# plt.xscale("log")
 plt.title("Wass DRO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
@@ -408,6 +411,7 @@ for i in range(1, 11):
     plt.fill_between(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i-1], axis=1), 
                        np.sum(ros[12:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
+# plt.xscale("log")
 plt.title("Mean-Var RO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
@@ -422,6 +426,7 @@ for i in range(1, 11):
     plt.fill_between(np.array(dfgrid2["Avg_prob_test"]), np.sum(res[:, :i-1], axis=1), 
                        np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
+# plt.xscale("log")
 plt.title("Reshaped DRO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
@@ -431,15 +436,16 @@ plt.show()
 
 plt.figure(figsize = (5,4))
 rores = np.vstack(rores)
-print(rores)
+print(dfgrid4["Avg_prob_test"])
 for i in range(1, 11):
-    plt.plot(np.array(dfgrid4["Avg_prob_test"]), np.sum(rores[:, :i], axis=1),
+    plt.plot(np.array(dfgrid4["Avg_prob_test"])[2:], np.sum(rores[2:, :i], axis=1),
                color='black', linewidth=1.0)
-    plt.fill_between(np.array(dfgrid4["Avg_prob_test"]), np.sum(rores[:, :i-1], axis=1), 
-                       np.sum(rores[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+    plt.fill_between(np.array(dfgrid4["Avg_prob_test"])[2:], np.sum(rores[2:, :i-1], axis=1), 
+                       np.sum(rores[2:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
+# plt.xscale("log")
 plt.title("Reshaped RO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
-plt.savefig(foldername + "Reshaped-ro-dis.pdf", bbox_inches='tight')
+plt.savefig(foldername + "Reshaped-ro-dis1.pdf", bbox_inches='tight')
 plt.show()
