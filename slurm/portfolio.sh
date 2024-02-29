@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem-per-cpu=20G
+#SBATCH --mem-per-cpu=5G
 #SBATCH --time=20:00:00
 #SBATCH -o /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/portfolio_test_%A_.txt
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
@@ -13,9 +13,9 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-python portfolio/portfolio1.1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old56/results7/ --eta 0.30
+# python portfolio/portfolio1_100.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old58/results15/ --eta 0.30
 
-# python portfolio/plot_avg_10.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old52/
+python portfolio/plot_avg_10.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old52/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
@@ -105,4 +105,7 @@ python portfolio/portfolio1.1.py --foldername /scratch/gpfs/iywang/learn_robust/
 
 #old55 n=10 init  // 100steps par true
 #old56 init 100 steps par true lr=0.0001 // 0.5*init lr=0.001 100step
-#old57 n=5 train mro k=50 200steps 0.5*I lr=0.001 
+#old56 n=5 train mro k=50 200steps 0.5*I lr=0.001 
+
+#old57 n=5 train mro k=50 200steps 0.5*I lr=0.001 // init=I
+#old58 (reg 0.01I) n=10 train r+10 init 100steps par true lr=0.0001 // 0.5*init lr=0.001
