@@ -438,10 +438,10 @@ plt.figure(figsize = (5,4))
 rores = np.vstack(rores)
 print(dfgrid4["Avg_prob_test"])
 for i in range(1, 11):
-    plt.plot(np.array(dfgrid4["Avg_prob_test"])[2:], np.sum(rores[2:, :i], axis=1),
+    plt.plot(np.array(dfgrid4["Avg_prob_test"])[3:], np.sum(rores[3:, :i], axis=1),
                color='black', linewidth=1.0)
-    plt.fill_between(np.array(dfgrid4["Avg_prob_test"])[2:], np.sum(rores[2:, :i-1], axis=1), 
-                       np.sum(rores[2:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+    plt.fill_between(np.array(dfgrid4["Avg_prob_test"])[3:], np.sum(rores[3:, :i-1], axis=1), 
+                       np.sum(rores[3:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
 plt.title("Reshaped RO")

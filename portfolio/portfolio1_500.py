@@ -275,6 +275,7 @@ if __name__ == '__main__':
     parser.add_argument('--eta', type=float, default=0.05)
     arguments = parser.parse_args()
     foldername = arguments.foldername
+    foldername = foldername + '/'
     eta = arguments.eta
     R = 20
     n = 10

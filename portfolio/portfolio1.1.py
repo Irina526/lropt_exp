@@ -240,7 +240,7 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.001, num_iter=200, optimizer="SGD",
+        result = prob.train(lr=0.001, num_iter=2, optimizer="SGD",
                             seed=s, init_A=0.5*init, init_b=init_bval, init_lam=1, init_mu=1,
                             mu_multiplier=1.01, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.2, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
@@ -270,7 +270,7 @@ def trainloop(r,foldername):
         # df = result.df
         # A_fin = result.A
         # b_fin = result.b
-        epslst=np.linspace(0.00001, 8, 100)
+        epslst=np.linspace(0.00001, 8, 1)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 20
+    R = 1
     n = 5
     # eta = 0.4
     seed = 25
