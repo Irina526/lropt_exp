@@ -247,7 +247,7 @@ def trainloop(r,foldername):
         df = result.df
         A_fin = result.A
         b_fin = result.b
-        epslst=np.linspace(0.00001, 1.3, 100)
+        epslst=np.linspace(0.00001, 5, 100)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df

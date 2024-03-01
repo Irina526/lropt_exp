@@ -159,7 +159,7 @@ for N in nvals:
             dfgrid3 = pd.read_csv(foldername + f"results{18}/" + f"gridmv_{N,n,r}.csv")
             dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
             dfgrid = pd.read_csv(foldername + f"results{17}/" + f"gridmv_{N,n,r}.csv")
-            dfgrid4 = pd.read_csv(foldername + f"resultsrore1/" + f"results{i}/" + f"gridre_{N,n,r}.csv")
+            dfgrid4 = pd.read_csv(foldername + f"resultsrore2/" + f"results{i}/" + f"gridre_{N,n,r}.csv")
 
             ind_2 = np.absolute(np.mean(np.vstack(dfgrid2['Avg_prob_test']),axis = 1)-1).argmin()
             ind_s = [np.absolute(np.mean(np.vstack(dfgrid['Avg_prob_test']),axis = 1)-testetas[i]).argmin() for i in range(len(testetas))]
@@ -336,7 +336,7 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$n={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}_2.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}_3.pdf", bbox_inches='tight')
     plt.show()
 
 

@@ -87,8 +87,8 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
     ax.plot(np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], df_standard['Test_val'][beg1:end1], color="tab:blue", label=r"Mean-Var set")
     ax.fill(np.append(np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1],np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1][::-1]), np.append(df_standard['Lower_test'][beg1:end1],df_standard['Upper_test'][beg1:end1][::-1]), color="tab:blue", alpha=0.2)
 
-    # ax.plot(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], df_reshape['Test_val'][beg2:end2], color="tab:orange", label=r"Reshaped set")
-    # ax.fill(np.append(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2],np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2][::-1]), np.append(df_reshape['Lower_test'][beg2:end2],df_reshape['Upper_test'][beg2:end2][::-1]), color="tab:orange", alpha=0.2)
+    ax.plot(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], df_reshape['Test_val'][beg2:end2], color="tab:orange", label=r"Reshaped set")
+    ax.fill(np.append(np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2],np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2][::-1]), np.append(df_reshape['Lower_test'][beg2:end2],df_reshape['Upper_test'][beg2:end2][::-1]), color="tab:orange", alpha=0.2)
     ax.set_xlabel("Probability of constraint violation")
     ax.axvline(x = 0.03, color = "green", linestyle = "-.",label = r"$\eta = 0.03$")
     # ax.scatter(0.03,y = np.mean([-0.26913068, -0.26968575, -0.26027287, -0.05857202, -0.15843752]), color = "red")
@@ -104,8 +104,8 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
     ax1.plot(np.mean(np.vstack(df_standard['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(df_standard['Test_val']),axis = 1)[beg1:end1], color="tab:blue", label=r"Mean-Var set")
     ax1.fill(np.append(np.quantile(np.vstack(df_standard['Coverage_test']),0.1,axis = 1)[beg1:end1],np.quantile(np.vstack(df_standard['Coverage_test']),0.9,axis = 1)[beg1:end1][::-1]), np.append(np.quantile(np.vstack(df_standard['Test_val']),0.1,axis = 1)[beg1:end1],np.quantile(np.vstack(df_standard['Test_val']),0.90,axis = 1)[beg1:end1][::-1]), color="tab:blue", alpha=0.2)
 
-    # ax1.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(df_reshape['Test_val']),axis = 1)[beg2:end2], color = "tab:orange",label=r"Decision-Focused set")
-    # ax1.fill(np.append(np.quantile(np.vstack(df_reshape['Coverage_test']),0.1,axis = 1)[beg2:end2],np.quantile(np.vstack(df_reshape['Coverage_test']),0.9,axis = 1)[beg2:end2][::-1]), np.append(np.quantile(np.vstack(df_reshape['Test_val']),0.1,axis = 1)[beg2:end2],np.quantile(np.vstack(df_reshape['Test_val']),0.90,axis = 1)[beg2:end2][::-1]), color="tab:orange", alpha=0.2)
+    ax1.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(df_reshape['Test_val']),axis = 1)[beg2:end2], color = "tab:orange",label=r"Decision-Focused set")
+    ax1.fill(np.append(np.quantile(np.vstack(df_reshape['Coverage_test']),0.1,axis = 1)[beg2:end2],np.quantile(np.vstack(df_reshape['Coverage_test']),0.9,axis = 1)[beg2:end2][::-1]), np.append(np.quantile(np.vstack(df_reshape['Test_val']),0.1,axis = 1)[beg2:end2],np.quantile(np.vstack(df_reshape['Test_val']),0.90,axis = 1)[beg2:end2][::-1]), color="tab:orange", alpha=0.2)
     if dfs:
         for i in range(5):
             ax1.plot(np.mean(np.vstack(dfs[i+1][0]['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(dfs[i+1][0]['Test_val']),axis = 1)[beg1:end1], color="tab:blue", linestyle = "-")
@@ -124,27 +124,27 @@ def plot_coverage_all(df_standard,df_reshape,dfs,title,title1,ind_1 = (0,100), i
 
     ax2.plot(df_standard['Coverage_test'][beg1:end1], np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue", label=r"Mean-Var set")
 
-    # ax2.plot(df_reshape['Coverage_test'][beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange", label=r"Reshaped set",alpha = 0.8)
-    # if dfs:
-    #     for i in range(5):
-    #         ax2.plot(np.mean(np.vstack(dfs[i+1][0]['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(dfs[i+1][0]['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue", linestyle = "-")
-    #         ax2.plot(np.mean(np.vstack(dfs[i+1][1]['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(dfs[i+1][1]['Avg_prob_test']),axis = 1)[beg2:end2], color = "tab:orange",linestyle = "-")
+    ax2.plot(df_reshape['Coverage_test'][beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange", label=r"Reshaped set",alpha = 0.8)
+    if dfs:
+        for i in range(5):
+            ax2.plot(np.mean(np.vstack(dfs[i+1][0]['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(dfs[i+1][0]['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue", linestyle = "-")
+            ax2.plot(np.mean(np.vstack(dfs[i+1][1]['Coverage_test']),axis = 1)[beg2:end2],np.mean(np.vstack(dfs[i+1][1]['Avg_prob_test']),axis = 1)[beg2:end2], color = "tab:orange",linestyle = "-")
     # ax2.plot(np.arange(100)/100, 1 - np.arange(100)/100, color = "red")
     # ax2.set_ylim([-0.05,0.25])
     ax2.axvline(x = 0.8, color = "black",linestyle = ":", label = "0.8 Coverage")
     ax2.axhline(y = 0.03, color = "green",linestyle = "-.", label = r"$\hat{\eta} = 0.03$")
     ax2.set_ylabel("Prob. of cons. vio.")
     ax2.set_xlabel("Test set coverage")
-    # if zoom:
-    #     axins = zoomed_inset_axes(ax2, 6, loc="upper center")
-    #     axins.set_xlim(-0.005, 0.1)
-    #     axins.set_ylim(-0.001,0.035)
-    #     axins.plot(np.mean(np.vstack(df_standard['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue")
-    #     axins.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange",alpha = 0.8)
-    #     axins.axhline(y = 0.03, color = "green",linestyle = "-.", label = r"$\hat{\eta} = 0.03$")
-    #     axins.set_xticks(ticks=[])
-    #     axins.set_yticks(ticks=[])
-    #     mark_inset(ax2, axins, loc1=3, loc2=4, fc="none", ec="0.5")
+    if zoom:
+        axins = zoomed_inset_axes(ax2, 6, loc="upper center")
+        axins.set_xlim(-0.005, 0.1)
+        axins.set_ylim(-0.001,0.035)
+        axins.plot(np.mean(np.vstack(df_standard['Coverage_test']),axis = 1)[beg1:end1], np.mean(np.vstack(df_standard['Avg_prob_test']),axis = 1)[beg1:end1], color="tab:blue")
+        axins.plot(np.mean(np.vstack(df_reshape['Coverage_test']),axis = 1)[beg2:end2], np.mean(np.vstack(df_reshape['Avg_prob_test']),axis = 1)[beg2:end2], color="tab:orange",alpha = 0.8)
+        axins.axhline(y = 0.03, color = "green",linestyle = "-.", label = r"$\hat{\eta} = 0.03$")
+        axins.set_xticks(ticks=[])
+        axins.set_yticks(ticks=[])
+        mark_inset(ax2, axins, loc1=3, loc2=4, fc="none", ec="0.5")
     if logscale:
         ax2.set_xscale("log")
     # ax2.ticklabel_format(style="sci",axis='y',scilimits = (0,0), useMathText=True)
@@ -224,7 +224,7 @@ def trainloop(r,foldername):
         init_bval = np.zeros(n)
 
         u = lropt.UncertainParameter(n,
-                                uncertainty_set=lropt.MRO(K=50,p=2,train=True,
+                                uncertainty_set=lropt.MRO(K=5,p=2,train=True,
                                                             data=train))
         # Formulate the Robust Problem
         x = cp.Variable(n)
@@ -240,12 +240,14 @@ def trainloop(r,foldername):
         #s=0,2,4,6,0
         #iters = 5000
         # Train A and b
-        result = prob.train(lr=0.001, num_iter=2, optimizer="SGD",
+        result = prob.train(lr=0.001, num_iter=200, optimizer="SGD",
                             seed=s, init_A=0.5*init, init_b=init_bval, init_lam=1, init_mu=1,
                             mu_multiplier=1.01, init_alpha=0., test_percentage = test_p, save_history = False, lr_step_size = 50, lr_gamma = 0.2, position = False, random_init = False, num_random_init=5, parallel = True, eta = eta, kappa=0.0)
         df = result.df
         A_fin = result.A
         b_fin = result.b
+        prob.solve()
+        print(prob.solver_stats.solve_time)
             
         u = lropt.UncertainParameter(n,
                                 uncertainty_set=lropt.MRO(K=train.shape[0],p=2,train=True,
@@ -270,7 +272,7 @@ def trainloop(r,foldername):
         # df = result.df
         # A_fin = result.A
         # b_fin = result.b
-        epslst=np.linspace(0.00001, 8, 1)
+        epslst=np.linspace(0.00001, 5, 100)
         result5 = prob.grid(epslst=epslst, init_A=A_fin, init_b=b_fin, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata = (newdata,new_y_data), eta=eta)
         dfgrid2 = result5.df
@@ -300,7 +302,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     foldername = arguments.foldername
     eta = arguments.eta
-    R = 1
+    R = 20
     n = 5
     # eta = 0.4
     seed = 25

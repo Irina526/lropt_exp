@@ -226,7 +226,7 @@ def trainloop(r,foldername):
         init_bval = np.zeros(n)
                 
         u = lropt.UncertainParameter(n,
-                                uncertainty_set=lropt.MRO(K=50,p=2,train=True,
+                                uncertainty_set=lropt.MRO(K=5,p=2,train=True,
                                                             data=train))
         # Formulate the Robust Problem
         x = cp.Variable(n)
@@ -248,6 +248,8 @@ def trainloop(r,foldername):
         df = result.df
         A_fin = result.A
         b_fin = result.b
+        prob.solve()
+        print(prob.solver_stats.solve_time)
         
         # Formulate the DRO Robust Problem
         u = lropt.UncertainParameter(n,
@@ -272,7 +274,8 @@ def trainloop(r,foldername):
                             init_b=init_bval, seed=s,
                             init_alpha=0., test_percentage=test_p, newdata=(newdata,new_y_data), eta=eta)
         dfgrid = result4.df
-
+        prob.solve()
+        print(prob.solver_stats.solve_time)
         plot_coverage_all(dfgrid,dfgrid2,None, foldername + f"port(N,m,r)_{N,n,r}", f"port(N,m,r)_{N,n,r}", ind_1=(0,10000),ind_2=(0,10000), logscale = False, zoom = False,legend = True)
 
         plot_iters(df, result.df_test, foldername + f"port(N,m)_{N,n,r}", steps = 10000,logscale = 1)

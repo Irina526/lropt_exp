@@ -157,7 +157,7 @@ for N in nvals:
             probs_beta[method] = []
         for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
-            dfgrid2 = pd.read_csv(foldername + f"results{i+offset}/" + f"gridre_{N,n,r}.csv")
+            dfgrid2 = pd.read_csv(foldername + f"resultsrore1/" + f"results{i+8}/" + f"gridre_{N,n,r}.csv")
             dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{N,n,r}.csv")
             dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{i}/" + f"gridre_{N,n,r}.csv")
 
@@ -331,7 +331,7 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$n={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}_1.pdf", bbox_inches='tight')
     plt.show()
 
 plt.rcParams.update({
@@ -344,7 +344,7 @@ plt.rcParams.update({
 
 dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
 
-dfgrid2 = pd.read_csv(foldername + f"results{7}/" + f"gridre_{500,n,0}.csv")
+dfgrid2 = pd.read_csv(foldername + f"resultsrore1/" + f"results{7+8}/" + f"gridre_{500,n,0}.csv")
 dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,0}.csv")
 dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,12}.csv")
 
