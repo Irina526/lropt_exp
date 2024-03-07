@@ -13,9 +13,9 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-# python portfolio/portfolio1_500.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old58/results0/ --eta 0.30
+# python portfolio/portfolio1.1_MRO.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old60/results16/ --eta 0.30
 
-python portfolio/plot_avg_10.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old52/
+python portfolio/plot_avg_5.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/portfolio/old53/
 
 # python portfolio/MIP/plots.py --foldername /scratch/gpfs/iywang/mro_results/portfolio/new/m30_K1000_r10/
 
@@ -107,7 +107,9 @@ python portfolio/plot_avg_10.py --foldername /scratch/gpfs/iywang/learn_robust/l
 #old56 n=10 init 100 steps par true lr=0.0001 // 0.5*init lr=0.001 100step
 #old56 n=5 train mro k=50 200steps 0.5*I lr=0.001 
 
-#old57 n=5 train mro k=5
+#old57 n=5 train mro k=5//
 #old58 0: n=10 init 100 steps more eps // n=10 train mro k=5
 
 #old59 n=5 train mro k=50 200steps 0.5*I lr=0.001 (rore1 old53)
+
+#old60 n=10 train mro k=5 // n=5 

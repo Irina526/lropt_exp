@@ -79,7 +79,7 @@ def pareto_frontier_3(Xs, Ys, Zs, maxX=False, maxY=False):
 nvals = np.array([500])
 n = 10
 lower_q = 0.3
-upper_q = 0.6
+upper_q = 0.7
 #etas = [0.03]
 etas = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
 # etas = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.13, 0.15, 0.18, 0.20, 0.25,0.30]
@@ -157,7 +157,7 @@ for N in nvals:
             probs_beta[method] = []
         for r in range(20):
             dfgrid = pd.read_csv(foldername + f"results{i+offset}/" + f"gridmv_{N,n,r}.csv")
-            dfgrid2 = pd.read_csv(foldername + f"resultsrore1/" + f"results{i+8}/" + f"gridre_{N,n,r}.csv")
+            dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{i+0}/" + f"gridre_{N,n,r}.csv")
             dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{N,n,r}.csv")
             dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{i}/" + f"gridre_{N,n,r}.csv")
 
@@ -307,7 +307,7 @@ for N in nvals:
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_rore_plot[:],val_rore_lower_plot[:], val_rore_upper_plot[:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped DRO", color = "tab:red")
+    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped MRO", color = "tab:red")
     plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:red", alpha=0.3)
 
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
@@ -344,7 +344,7 @@ plt.rcParams.update({
 
 dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
 
-dfgrid2 = pd.read_csv(foldername + f"resultsrore1/" + f"results{7+8}/" + f"gridre_{500,n,0}.csv")
+dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{7}/" + f"gridre_{500,n,0}.csv")
 dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,0}.csv")
 dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,12}.csv")
 
@@ -427,7 +427,7 @@ for i in range(1, 11):
                        np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
-plt.title("Reshaped DRO")
+plt.title("Reshaped MRO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Reshaped-dis.pdf", bbox_inches='tight')
