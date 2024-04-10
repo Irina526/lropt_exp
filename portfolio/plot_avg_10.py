@@ -297,18 +297,18 @@ for N in nvals:
     
     plt.figure(figsize = (6,3))
 
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
-    plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
-
     paretox, paretoy = pareto_frontier(prob_rore_plot[:],val_rore_plot[:])
     paretox[11] += -0.004
-    plt.plot(paretox, paretoy,label="Reshaped RO", color = "tab:orange")
+    plt.plot(paretox, paretoy,label=r"$\rm{LRO_{RO}}$", color = "tab:orange")
     print("paretos", paretox, paretoy)
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_rore_plot[:],val_rore_lower_plot[:], val_rore_upper_plot[:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
 
-    plt.plot(prob_re_plot, val_re_plot, label = "Reshaped MRO", color = "tab:red")
+    plt.plot(prob_re_plot, val_re_plot, label = r"$\rm{LRO_{MRO}}$", color = "tab:red")
     plt.fill_between(prob_re_plot,val_re_lower_plot,val_re_upper_plot, color = "tab:red", alpha=0.3)
+
+    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
+    plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
 
@@ -331,7 +331,7 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$n={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}_1.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}_2.pdf", bbox_inches='tight')
     plt.show()
 
 plt.rcParams.update({
@@ -427,10 +427,10 @@ for i in range(1, 11):
                        np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
-plt.title("Reshaped MRO")
+plt.title(r"$\rm{LRO_{MRO}}$")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
-plt.savefig(foldername + "Reshaped-dis.pdf", bbox_inches='tight')
+plt.savefig(foldername + "Reshaped-dis-rename1.pdf", bbox_inches='tight')
 plt.show()
 
 
@@ -444,8 +444,8 @@ for i in range(1, 11):
                        np.sum(rores[3:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
-plt.title("Reshaped RO")
+plt.title(r"$\rm{LRO_{RO}}$")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
-plt.savefig(foldername + "Reshaped-ro-dis1.pdf", bbox_inches='tight')
+plt.savefig(foldername + "Reshaped-ro-dis-rename1.pdf", bbox_inches='tight')
 plt.show()

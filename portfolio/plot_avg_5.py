@@ -296,22 +296,19 @@ for N in nvals:
     #     ro_vals = np.vstack([ro_vals, dfgrid["Test_val"]])
     
     plt.figure(figsize = (6,3))
-
-    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
-    plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
-
     
     # plt.plot(prob_re_plot[:-1], val_re_plot[:-1], label = "Reshaped set", color = "tab:orange")
     # plt.fill_between(prob_re_plot[:-1],val_re_lower_plot[:-1],val_re_upper_plot[:-1], color = "tab:orange", alpha=0.3)
 
     paretox, paretoy = pareto_frontier(prob_re_plot[1:],val_re_plot[1:])
-    plt.plot(paretox, paretoy,label="Reshaped RO", color = "tab:orange")
+    plt.plot(paretox, paretoy,label=r"$\rm{LRO_{RO}}$", color = "tab:orange")
     paretox1, paretoylower, paretoyupper = pareto_frontier_3(prob_re_plot[1:],val_re_lower_plot[1:], val_re_upper_plot[1:])
     plt.fill_between(paretox1,paretoylower,paretoyupper, color = "tab:orange", alpha=0.3)
-
-    plt.plot(prob_rore_plot, val_rore_plot, label = "Reshaped MRO", color = "tab:red" )
+    plt.plot(prob_rore_plot, val_rore_plot, label = r"$\rm{LRO_{MRO}}$", color = "tab:red" )
     plt.fill_between(prob_rore_plot,val_rore_lower_plot,val_rore_upper_plot, color = "tab:red", alpha=0.3)
 
+    plt.plot(prob_ro_plot, val_ro_plot, label = "Mean-Var RO", color = "tab:blue" )
+    plt.fill_between(prob_ro_plot,val_ro_lower_plot,val_ro_upper_plot, color = "tab:blue", alpha=0.3)
 
     plt.fill_between(prob_st_plot,val_st_lower_plot,val_st_upper_plot, color = "tab:green", alpha=0.3)
     plt.plot(prob_st_plot, val_st_plot, label = "Wass DRO", color = "tab:green")
@@ -334,6 +331,6 @@ for N in nvals:
     plt.ylabel("Objective value")
     plt.title(f"$n={n}$")
     plt.legend(loc='upper right')
-    plt.savefig(foldername + f"{N}_4.pdf", bbox_inches='tight')
+    plt.savefig(foldername + f"{N}_5.pdf", bbox_inches='tight')
     plt.show()
 

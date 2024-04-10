@@ -13,7 +13,7 @@ module purge
 module load anaconda3/2023.9
 conda activate lropt
 
-# python inventory/inventory1.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/results17/ --eta 0.30
+# python inventory/inventory_8_MRO.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old56/results15/ --eta 0.30
 
 python inventory/plot_avg_redo.py --foldername /scratch/gpfs/iywang/learn_robust/lropt_results/inventory/old46/
 
@@ -116,7 +116,18 @@ python inventory/plot_avg_redo.py --foldername /scratch/gpfs/iywang/learn_robust
 
 #old42 m8 r20 init k=0 traineps 200iters lr0.01 no par, m4
 #old43 m4 r20 5*init k=0. lr0.0001, m8
-#old44 m8 init lr=0.0001, m4 (CURRENT) + 0.03 with train
-#old45 m8 init lr=0.001, m4  (CURRENT)
+#old44 m8 init lr=0.0001, m4 + 0.03 with train
+#old45 m8 init lr=0.001, m4 
 
-#old46 m8 init // m4 N=100 //mro
+#old46 m8 init // m4 N=100 //mro (CURRENT)
+
+#old47 mro m4 0.5init // m8  lam,mu=2 , lr=0.0001
+#old48 mro m4//m8 0.5init, lam200,mu=200, lr=0.0001
+#old49 mro m4 0.3init, lam100, mu200, lr=0.0005 kappa=0.1 // lam,mu100 lr=0.001 k0.05 0.2init
+#old50 mro m8 0.3init, lam100mu200 lr=0.0005 k0.1 // m4 1.5init lammu20, lr=0.0001 k0.01
+#old51 m8 1.5init lammu20, lr=0.0001 k0.01 // m4 0.5*init, lammu20,lr=0.001 k=0.01
+#old52 m8 0.5init, lammu20, lr=0.001, k=0.01 //0.4init, lammu30, lr=0.001, k=0.1
+#old53 m4 0.4init, lammu30,lr=0.001,k=0.1 // m4 0.4init, k=0.05 r+10
+#old54 m8 0.4init k=0.05 r+10 (USABLE)// m8 0.4init, k=0.05, r+10, lammu30, lr=0.01
+#old55 m4 0.4init, k=0.05, r+10, lammu30, lr=0.01 // 
+#old56 m4 mvinit, lr=0.001 k=0.1 // m8 mvinit, k=0.1 lr=0.001 lammu30
