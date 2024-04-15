@@ -342,11 +342,11 @@ plt.rcParams.update({
 })
 
 
-dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,7}.csv")
+dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,12}.csv")
 
-dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{7}/" + f"gridre_{500,n,7}.csv")
-dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,7}.csv")
-dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,7}.csv")
+dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{7}/" + f"gridre_{500,n,12}.csv")
+dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,12}.csv")
+dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,12}.csv")
 
 dros = []
 ros = []
@@ -397,10 +397,10 @@ newzipped=sorted(zipped)
 dros = np.vstack([z[1] for z in newzipped])
 dros = dros.T
 for i in range(1, 11):
-    plt.plot(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i], axis=1),
+    plt.plot(np.array(dfgrid["Avg_prob_test"])[6:], np.sum(dros[6:, :i], axis=1),
                color='black', linewidth=1.0)
-    plt.fill_between(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i-1], axis=1), 
-                       np.sum(dros[10:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+    plt.fill_between(np.array(dfgrid["Avg_prob_test"])[6:], np.sum(dros[6:, :i-1], axis=1), 
+                       np.sum(dros[6:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
 plt.title("Wass DRO")
@@ -418,10 +418,10 @@ ros = np.vstack([z[1] for z in newzipped])
 ros = ros.T
 
 for i in range(1, 11):
-    plt.plot(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i], axis=1),
+    plt.plot(np.array(dfgrid3["Avg_prob_test"])[10:], np.sum(ros[10:, :i], axis=1),
                color='black', linewidth=1.0)
-    plt.fill_between(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i-1], axis=1), 
-                       np.sum(ros[12:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
+    plt.fill_between(np.array(dfgrid3["Avg_prob_test"])[10:], np.sum(ros[10:, :i-1], axis=1), 
+                       np.sum(ros[10:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
 plt.title("Mean-Var RO")
