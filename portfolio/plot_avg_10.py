@@ -342,11 +342,11 @@ plt.rcParams.update({
 })
 
 
-dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,0}.csv")
+dfgrid = pd.read_csv(foldername + f"results{7}/" + f"gridmv_{500,n,7}.csv")
 
-dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{7}/" + f"gridre_{500,n,0}.csv")
-dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,0}.csv")
-dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,12}.csv")
+dfgrid2 = pd.read_csv(foldername + f"resultsrore2/" + f"results{7}/" + f"gridre_{500,n,7}.csv")
+dfgrid3 = pd.read_csv(foldername + f"results{20}/" + f"gridmv_{500,n,7}.csv")
+dfgrid4 = pd.read_csv(foldername + f"resultsrore/" + f"results{7}/" + f"gridre_{N,n,7}.csv")
 
 dros = []
 ros = []
@@ -388,8 +388,14 @@ for i in range(100):
     rores.append(np.array([float(j) for j in rore]))
 
 
+mu_list = np.array([0.71, 0.86, 0.50, 0.65, 0.57, 0.55, 0.59, 0.67, 0.70, 0.77])
+
 plt.figure(figsize = (5,4))
 dros = np.vstack(dros)
+zipped = zip(mu_list,dros.T)
+newzipped=sorted(zipped)
+dros = np.vstack([z[1] for z in newzipped])
+dros = dros.T
 for i in range(1, 11):
     plt.plot(np.array(dfgrid["Avg_prob_test"])[10:], np.sum(dros[10:, :i], axis=1),
                color='black', linewidth=1.0)
@@ -403,8 +409,14 @@ plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Wass-dis.pdf", bbox_inches='tight')
 plt.show()
 
+
 plt.figure(figsize = (5,4))
 ros = np.vstack(ros)
+zipped = zip(mu_list,ros.T)
+newzipped=sorted(zipped)
+ros = np.vstack([z[1] for z in newzipped])
+ros = ros.T
+
 for i in range(1, 11):
     plt.plot(np.array(dfgrid3["Avg_prob_test"])[12:], np.sum(ros[12:, :i], axis=1),
                color='black', linewidth=1.0)
@@ -420,6 +432,10 @@ plt.show()
 
 plt.figure(figsize = (5,4))
 res = np.vstack(res)
+zipped = zip(mu_list,res.T)
+newzipped=sorted(zipped)
+res = np.vstack([z[1] for z in newzipped])
+res = res.T
 for i in range(1, 11):
     plt.plot(np.array(dfgrid2["Avg_prob_test"]), np.sum(res[:, :i], axis=1),
                color='black', linewidth=1.0)
@@ -427,7 +443,7 @@ for i in range(1, 11):
                        np.sum(res[:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
-plt.title(r"$\rm{LRO_{MRO}}$")
+plt.title("LRO-MRO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Reshaped-dis-rename1.pdf", bbox_inches='tight')
@@ -436,6 +452,10 @@ plt.show()
 
 plt.figure(figsize = (5,4))
 rores = np.vstack(rores)
+zipped = zip(mu_list,rores.T)
+newzipped=sorted(zipped)
+rores = np.vstack([z[1] for z in newzipped])
+rores = rores.T
 print(dfgrid4["Avg_prob_test"])
 for i in range(1, 11):
     plt.plot(np.array(dfgrid4["Avg_prob_test"])[3:], np.sum(rores[3:, :i], axis=1),
@@ -444,7 +464,7 @@ for i in range(1, 11):
                        np.sum(rores[3:, :i], axis=1),color=plt.cm.RdYlBu(1 - i/11))
 # plt.xlim([-0.03,0.33])
 # plt.xscale("log")
-plt.title(r"$\rm{LRO_{RO}}$")
+plt.title("LRO-RO")
 plt.xlabel(r"$\hat{\eta}$")
 plt.ylabel("Portfolio weights")
 plt.savefig(foldername + "Reshaped-ro-dis-rename1.pdf", bbox_inches='tight')
